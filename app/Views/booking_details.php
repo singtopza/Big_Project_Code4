@@ -4,6 +4,7 @@
 <head>
 	<title>I-Van</title>
 	<?php require('components/header.php'); ?>
+	
 	<style>
 		#map {
 			width: 70%;
