@@ -79,7 +79,7 @@
                             <div class="modal-body">
                               <label for="reason">โปรดระบุหมายเหตุ</label>
                               <input type="hidden" name="pay_id" value="<?= $value['Pay_ID']; ?>">
-                              <textarea type="text" id="reason" class="form-control" name="reason"></textarea>
+                              <textarea type="text" id="reason" class="form-control" name="reason" required></textarea>
                             </div>
                             <div class="modal-footer">
                               <input type="submit" class="btn btn-success" value="ยืนยัน" />
