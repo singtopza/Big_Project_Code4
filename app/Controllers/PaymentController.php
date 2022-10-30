@@ -163,6 +163,7 @@ class PaymentController extends Controller
 
   public function cancel_payment()
   {
+    $session = session();
     $pay_id = $this->request->getVar('pay_id');
     $reason = $this->request->getVar('reason');
     $data = [
@@ -172,7 +173,10 @@ class PaymentController extends Controller
     $model_payment = new PaymentModel();
     $data_payment_cancel = $model_payment->update($pay_id, $data);
     if ($data_payment_cancel) {
-      // ไม่ดำเนินการใดๆ
+      $session->setFlashdata('swel_title', 'การยกเลิกสำเร็จแล้ว');
+      $session->setFlashdata('swel_text', 'ผู้ใช้จะได้รับการแจ้งเตือน และทราบหมายเหตุของการยกเลิก!');
+      $session->setFlashdata('swel_icon', 'success');
+      $session->setFlashdata('swel_button', 'ดำเนินการต่อ');
     } else {
       require_once(APPPATH . 'Controllers/components/setting.php');
       $session->setFlashdata('swel_title', $st_sw_title_unlogin);
