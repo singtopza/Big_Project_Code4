@@ -15,7 +15,7 @@
         <div class=" tabcard_des px-0">
           <h1 class="logreg-txt text-center py-5">ข้อมูลส่วนตัว</h1>
           <center>
-              <img src="<?php echo $Q_Picture; ?>" width="100px" height="100px" alt="<?php echo $Q_Picture; ?>" class="profile-user-profile">
+            <img src="<?php echo $Q_Picture; ?>" width="100px" height="100px" alt="<?php echo $Q_Picture; ?>" class="profile-user-profile">
           </center>
           <br>
           <div class="container">
@@ -42,6 +42,7 @@
                   </div>
 
                 </div>
+
                 <div class="row mt-4">
                   <div class="col-sm-3 col-2"></div>
                   <div class="col-3 txt-color-1">
@@ -58,21 +59,25 @@
                     <txt>เบอร์โทรศัพท์ </txt>
                   </div>
                   <div class="col-6 txt-color-5">
-                    <txt id="profile_phone"><?php if(isset($Q_Phone)) { echo $Q_Phone; } else { echo "ไม่ระบุ"; } ?></txt>
+                    <txt id="profile_phone"><?php if (isset($Q_Phone)) {
+                                              echo $Q_Phone;
+                                            } else {
+                                              echo "ไม่ระบุ";
+                                            } ?></txt>
                   </div>
 
                 </div>
 
-                <?php if($Q_Facebook != 'true') { ?>
-                <div class="row mt-4">
-                  <div class="col-sm-3 col-2"></div>
-                  <div class="col-3 txt-color-1">
-                    <txt>รหัสผ่าน </txt>
+                <?php if ($Q_Facebook == '' || $Q_Facebook == null) { ?>
+                  <div class="row mt-4">
+                    <div class="col-sm-3 col-2"></div>
+                    <div class="col-3 txt-color-1">
+                      <span>รหัสผ่าน </span>
+                    </div>
+                    <div class="col-6 txt-color-5">
+                      <a href="<?php echo base_url('/change-password'); ?>" class="unlink">เปลี่ยนรหัสผ่าน</a>
+                    </div>
                   </div>
-                  <div class="col-6 txt-color-5">
-                    <txt><a href="<?php echo base_url('/change-password'); ?>" class="unlink">เปลี่ยนรหัสผ่าน</a></txt>
-                  </div>
-                </div>
                 <?php } ?>
               </div>
               <div class="col-1"></div>

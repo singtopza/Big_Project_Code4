@@ -5,7 +5,7 @@
   <title>I-Van</title>
   <?php require_once(APPPATH . 'Views/components_emp/header.php'); ?>
   <style>
-    center nav ul li a {
+    ul.pagination li a {
       border: 2px solid #FFC758;
       border-radius: 10px;
       padding: 0px 20px 0px 20px;
@@ -14,7 +14,7 @@
       text-decoration: none;
     }
 
-    center nav ul li a:hover {
+    ul.pagination li a:hover {
       background-color: wheat;
       border: 2px solid #FFC758;
       border-radius: 10px;
@@ -41,7 +41,7 @@
         </div>
         <div class="tabcard_em px-4">
           <center>
-            <?= $pager->links(); ?>
+            <?php echo $pager->links(); ?>
             <table class="mange-table" width="100%">
               <tr>
                 <th class="mange-th">
@@ -110,12 +110,12 @@
 </html>
 <script>
   $(document).ready(function() {
-    <?php if (session()->getFlashdata('swel_title_emp')) { ?>
+    <?php if (session()->getFlashdata('swel_title')) { ?>
       swal({
-        title: "<?= session()->getFlashdata('swel_title_emp') ?>",
-        text: "<?= session()->getFlashdata('swel_text_emp') ?>",
-        icon: "<?= session()->getFlashdata('swel_icon_emp') ?>",
-        button: "<?= session()->getFlashdata('swel_button_emp') ?>",
+        title: "<?= session()->getFlashdata('swel_title') ?>",
+        text: "<?= session()->getFlashdata('swel_text') ?>",
+        icon: "<?= session()->getFlashdata('swel_icon') ?>",
+        button: "<?= session()->getFlashdata('swel_button') ?>",
       });
     <?php } ?>
   });

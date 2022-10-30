@@ -32,9 +32,9 @@
               </div>
               <div class="row">
                 <div class="col-xxl-2 col-xl-2 col-lg-3 col-md-5 col-sm-5 col-4 text-end pt-3 pb-0 his-font-txt">
-                  <label><strong>รหัสตั๋ว</strong></label><br />
+                  <label><strong>หมายเลขตั๋ว</strong></label><br />
                   <label><strong>สถานี</strong></label><br />
-                  <label><strong>ใช้เมื่อวันที่</strong></label><br />
+                  <label><strong>วันที่เดินทาง</strong></label><br />
                   <label><strong>จำนวนที่นั่ง</strong></label>
                 </div>
                 <div class="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1 d-xxl-block d-xl-block d-lg-none d-md-none d-sm-none d-none"></div>
@@ -55,7 +55,7 @@
                 <div class="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1 d-xxl-block d-xl-block d-lg-none d-md-none d-sm-none d-none"></div>
                 <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-7 col-sm-7 col-8 text-start pt-3 pb-0 his-font-txt">
                   <a href="<?php echo base_url('/ticket' . "/" . $history_['Tick_Code']); ?>" target="_blank">
-                    <img src="https://chart.googleapis.com/chart?cht=qr&chl=Tick_Code&chs=160x160&chld=L|0" width="100px" height="100px">                 
+                    <img src="https://chart.googleapis.com/chart?cht=qr&chl=<?php echo base_url('/ticket' . "/" . $history_['Tick_Code']); ?>&chs=160x160&chld=L|0&choe=UTF-8" width="100px" height="100px">                 
                   </a>
                 </div>
               </div>

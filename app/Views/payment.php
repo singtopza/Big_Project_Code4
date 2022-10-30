@@ -101,7 +101,7 @@ $ses_Phone = $session->get('ses_phone');
                         <?php foreach ($banklist as $value) { ?>
                           <div class="col-sm-6">
                             <div class="custom-control custom-radio ps-5">
-                              <input type="radio" id="customRadio<?= $value['bank_ID']; ?>" name="radioBank" class="custom-control-input" value="<?= $value['bank_ID']; ?>" required>
+                              <input type="radio" id="customRadio<?= $value['bank_ID']; ?>" name="radioBank" class="custom-control-input" value="<?= $value['bank_ID']; ?>" <?php if (session()->getFlashdata('bank_id') && $value['bank_ID'] == session()->getFlashdata('bank_id')) { echo "checked"; } ?> >
                               <label class="custom-control-label" for="customRadio<?= $value['bank_ID']; ?>">
                                 <img src="<?php echo base_url('images/' . $value['bank_logo']); ?>" width="50px" class="mx-3 mb-4" />
                                 หมายเลข: <?= $value['bank_number']; ?>
@@ -123,7 +123,7 @@ $ses_Phone = $session->get('ses_phone');
                     <td width="50%">
                       <div class="mb-4 mt-2" style="padding:0px 60px;">
                         <input type="hidden" name="reId" value="<?php echo $Reserve_ID; ?>">
-                        <input type="file" name="slip" id="formFile" class="form-control" accept="image/x-png,image/jpeg,image/jpg" required>
+                        <input type="file" name="slip" id="formFile" class="form-control" accept="image/x-png,image/jpeg,image/jpg">
                       </div>
                     </td>
                     <td width="50%"></td>

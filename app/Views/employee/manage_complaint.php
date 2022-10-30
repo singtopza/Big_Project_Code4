@@ -4,6 +4,30 @@
 <head>
   <title>I-Van</title>
   <?php require_once(APPPATH . 'Views/components_emp/header.php'); ?>
+  <style>
+    ul.pagination li a {
+      border: 2px solid #FFC758;
+      border-radius: 10px;
+      padding: 0px 20px 0px 20px;
+      margin-right: 3px;
+      color: black;
+      text-decoration: none;
+    }
+
+    ul.pagination li a:hover {
+      background-color: wheat;
+      border: 2px solid #FFC758;
+      border-radius: 10px;
+      padding: 0px 20px 0px 20px;
+      margin-right: 3px;
+      color: black;
+      text-decoration: none;
+    }
+
+    .active a {
+      background-color: #FFC758;
+    }
+  </style>
 </head>
 
 <body>
@@ -15,7 +39,14 @@
         <div class="col-1 ps-0"></div>
         <div class="col-10">
           <div class="tabcard-showuser">
-            <h3 class="ps-3">การรายงานปัญหา</h3>
+            <div class="row">
+              <div class="col-4">
+                <h3 class="ps-3">การรายงานปัญหา</h3>
+              </div>
+              <div class="col-8 d-flex flex-row-reverse pt-2">
+                <?= $pager->links(); ?>
+              </div>
+            </div>
             <table class="tb-dash-table">
               <thead>
                 <th class="tb-dash-th-com" width="8%">ลำดับ</th>
@@ -54,12 +85,12 @@
 </html>
 <script>
   $(document).ready(function() {
-    <?php if (session()->getFlashdata('swel_title_emp')) { ?>
+    <?php if (session()->getFlashdata('swel_title')) { ?>
       swal({
-        title: "<?= session()->getFlashdata('swel_title_emp') ?>",
-        text: "<?= session()->getFlashdata('swel_text_emp') ?>",
-        icon: "<?= session()->getFlashdata('swel_icon_emp') ?>",
-        button: "<?= session()->getFlashdata('swel_button_emp') ?>",
+        title: "<?= session()->getFlashdata('swel_title') ?>",
+        text: "<?= session()->getFlashdata('swel_text') ?>",
+        icon: "<?= session()->getFlashdata('swel_icon') ?>",
+        button: "<?= session()->getFlashdata('swel_button') ?>",
       });
     <?php } ?>
   });

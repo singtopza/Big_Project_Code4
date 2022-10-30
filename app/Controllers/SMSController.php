@@ -6,7 +6,7 @@ use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\RESTful\ResourceController;
 
 use App\Models\UsersModel;
-use App\Models\OTPModel;
+use App\Models\SettingModel;
 
 class SMSController extends BaseController
 { 
@@ -22,8 +22,12 @@ class SMSController extends BaseController
     require_once(APPPATH . 'Controllers/components/user_connect.php');
     if (isset($Q_Pos_ID)) {
       if ($Q_Pos_ID >= 4) {
+
+        $model_setting = new SettingModel();
+        $data_setting = $model_setting->get_setting();
+        $otp_token = $data_setting->otp_token;
+
         $curl = curl_init();
-    
         curl_setopt_array($curl, array(
           CURLOPT_URL => 'https://thsms.com/api/me',
           CURLOPT_RETURNTRANSFER => true,

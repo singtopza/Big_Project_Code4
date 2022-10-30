@@ -25,6 +25,7 @@ $session = session();
             <form action="<?php echo base_url('/UserController/edit'); ?>" method="post" enctype="multipart/form-data">
               <center><label for="profile_choosefile" class=" btn btn-primary mb-4" id="choose-file-label"><i class="fa fa-picture-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;เลือกภาพ</label>
                 <input class="my-3" type="file" name="pic" id="profile_choosefile" accept="image/x-png,image/jpeg,image/jpg" style="display: none;" />
+                <a href="<?php echo base_url('/UserController/delete_imgprofile'); ?>" class="btn btn-danger mb-4"><i class="fa fa-trash-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;ลบรูปภาพ</a>
               </center>
               <?php if (isset($validation)) : ?>
                 <div class="alert alert-danger"><?= $validation->listErrors(); ?></div>
@@ -45,14 +46,22 @@ $session = session();
                                                                                                         } ?>">
                 </div>
               </div>
+              <?php if ($Q_Facebook == '' || $Q_Facebook == null) { ?>
               <div class="form-group row mb-4">
                 <label for="inputforemail" class="col-md-3 col-sm-4 col-form-label logreg-label-txt">อีเมล</label>
                 <div class="col-md-9 col-sm-8">
+                <?php ?>
                   <input type="text" name="email" class="form-control" id="inputforemail" value="<?php if (isset($Q_Email)) {
                                                                                                           echo $Q_Email;
                                                                                                         } ?>">
                 </div>
               </div>
+              <?php } else { ?>
+                <input type="hidden" name="email" class="form-control" id="inputforemail" value="<?php if (isset($Q_Email)) {
+                                                                                                          echo $Q_Email;
+                                                                                                        } ?>">
+              <?php } ?>
+
               <div class="form-group row mb-4">
                 <label for="inputforphone" class="col-md-3 col-sm-4 col-form-label logreg-label-txt">เบอร์โทรศัพท์</label>
                 <div class="col-md-9 col-sm-8">

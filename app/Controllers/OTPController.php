@@ -6,6 +6,7 @@ use CodeIgniter\Controller;
 
 use App\Models\UsersModel;
 use App\Models\OTPModel;
+use App\Models\SettingModel;
 
 class OTPController extends Controller
 {
@@ -43,7 +44,17 @@ class OTPController extends Controller
       $n_5 = rand(0, 9);
       $n_6 = rand(0, 9);
       $otp = $n_1.$n_2.$n_3.$n_4.$n_5.$n_6;
-      $timeout = time() + $st_otp_time_out_otp;
+
+      $model_setting = new SettingModel();
+      $data_setting = $model_setting->get_setting();
+      $otp_off_time = $data_setting->otp_off_time;
+
+      $timeout = time() + $otp_off_time;
+
+      $model_setting = new SettingModel();
+      $data_setting = $model_setting->get_setting();
+      $otp_name = $data_setting->otp_sender;
+      $otp_token = $data_setting->otp_token;
 
       $curl = curl_init();
   
@@ -143,8 +154,13 @@ class OTPController extends Controller
         $session->setFlashdata('swel_text', 'คุณสามารถเปลี่ยนรหัสผ่านได้แล้วในขณะนี้');
         $session->setFlashdata('swel_icon', 'success');
         $session->setFlashdata('swel_button', 'ดำเนินการต่อ');
-        // เพิ่มเวลา 15 นาที ในการเปลี่ยนรหัสผ่าน!
-        $model_otp->update_TimestampAfterConfirmOTP($otp, $refer, $key, $st_otp_time_out_key);
+        // เพิ่มเวลา otp_key_off_time นาที ในการเปลี่ยนรหัสผ่าน!
+
+        $model_setting = new SettingModel();
+        $data_setting = $model_setting->get_setting();
+        $otp_key_off_time = $data_setting->otp_key_off_time;
+
+        $model_otp->update_TimestampAfterConfirmOTP($otp, $refer, $key, $otp_key_off_time);
         $get_end_key = $model_otp->getEndKey($otp, $refer, $key);
         foreach ($get_end_key as $value) {
           $User_ID = $value['User'];

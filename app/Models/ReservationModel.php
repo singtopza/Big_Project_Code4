@@ -71,6 +71,32 @@ class ReservationModel extends Model
       ->getResultArray();
   }
 
+  public function getReservationForConfirm_ById($ses_userid, $reserve_id)
+  {
+    $where_sql = "reservation.User_ID = $ses_userid AND reservation.Status = 'waiting' AND reservation.Reserve_ID = $reserve_id";
+    return $this->db
+      ->table('reservation')
+      ->join('dock_car', 'reservation.Dock_car_id = dock_car.Dock_car_id')
+      ->join('ticket_price', 'reservation.Tic_Price_ID = ticket_price.Tic_Price_ID')
+      ->where($where_sql)
+      ->limit(1)
+      ->get()
+      ->getResultArray();
+  }
+
+  public function getReservationWaitingAll($ses_userid)
+  {
+    $where_sql = "reservation.User_ID = $ses_userid AND reservation.Status = 'waiting'";
+    return $this->db
+      ->table('reservation')
+      ->where($where_sql)
+      ->join('dock_car', 'reservation.Dock_car_id = dock_car.Dock_car_id')
+      ->join('ticket_price', 'reservation.Tic_Price_ID = ticket_price.Tic_Price_ID')
+      ->orderBy('reservation.Reserve_ID', 'ASC')
+      ->get()
+      ->getResultArray();
+  }
+
   public function getReservationAfterConfirm($ses_userid)
   {
     $where_sql = "User_ID = $ses_userid AND Status = 'confirm'";
@@ -112,7 +138,7 @@ class ReservationModel extends Model
       ->update();
   }
 
-  public function deleteReservationByIdWating($ses_userid)
+  public function deleteReservationWaitingAll($ses_userid)
   {
     $where_sql = "User_ID = $ses_userid AND Status = 'waiting'";
     return $this->db

@@ -51,7 +51,7 @@
               <label for="inputconfpassword" class="col-md-3 col-sm-4 col-form-label logreg-label-txt pe-0">ยืนยันรหัสผ่าน<font color="red"><span class="pe-3"></span>*</font></label>
               <div class="col-md-9 col-sm-8">
                 <input type="password" name="confpassword" class="form-control mb-3" id="inputconfpassword">
-                <input type="checkbox" name="acceptrule" id="cb-acceptrule" class="cb-acceptrule" <?php if(session()->getFlashdata('checkbox')) { echo "checked"; } ?> required>
+                <input type="checkbox" name="acceptrule" id="cb-acceptrule" class="cb-acceptrule" <?php if(session()->getFlashdata('checkbox')) { echo "checked"; } ?> >
                 <label for="cb-acceptrule" class="cb-acceptrule-txt mb-4">ฉันยอมรับ<a href="<?php echo base_url('/privacy'); ?>" class="acceptrule-link" target="_blank">นโยบายและข้อตกลง</a>ของเว็บไซต์ทั้งหมด<font color="red"><span class="pe-3"></span>*</font></label><br/>
               </div>
             </div>

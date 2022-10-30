@@ -63,10 +63,6 @@ $session = session();
               <span id="noti_bell_badge" class="top-0 start-100 translate-middle badge rounded-pill bg-danger">
                 <?php echo $countnotification_unread; ?>
               </span>
-            <?php } else if ($countnotification_unread > 5) { ?>
-              <span id="noti_bell_badge" class="top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                5
-              </span>
             <?php } ?>
           </a>
           <div class="navbar-nav">
@@ -167,17 +163,25 @@ $session = session();
                 <font color="#000000">บัญชีของฉัน</font>
               </a>
               <hr class="my-0" />
-              <?php if (isset($Q_Pos_ID) && $Q_Pos_ID >= 4) { ?>
+              <?php if (isset($Q_Pos_ID) && $Q_Pos_ID == 4) { ?>
                 <!-- Admin -->
-
+                <a href="<?php echo base_url('/EmployeeController/manager'); ?>" class="usrlist ps-3">
+                  <font color="#44B3F7">การจัดการ</font>
+                </a>
+                <hr class="my-0" />
               <?php }
-              if (isset($Q_Pos_ID) && $Q_Pos_ID >= 3) { ?>
+              if (isset($Q_Pos_ID) && $Q_Pos_ID == 3) { ?>
                 <!-- Officer -->
                 <a href="<?php echo base_url('/EmployeeController/manager'); ?>" class="usrlist ps-3">
                   <font color="#44B3F7">การจัดการ</font>
                 </a>
+                <hr class="my-0" />
               <?php }
-              if (isset($Q_Pos_ID) && $Q_Pos_ID >= 2) { ?>
+              if (isset($Q_Pos_ID) && $Q_Pos_ID == 2) { ?>
+                <!-- Driver -->
+                <a href="<?php echo base_url('/EmployeeController/manager'); ?>" class="usrlist ps-3">
+                  <font color="#44B3F7">ข้อมูลรถตู้</font>
+                </a>
                 <hr class="my-0" />
               <?php } ?>
               <?php if (isset($Reserve_ID_Nav) && !empty($Reserve_ID_Nav) and $Confirm_Nav == "success" and isset($CheckTicket_Nav) and $CheckTicket_Nav <= 0) { ?>
@@ -186,7 +190,7 @@ $session = session();
                   <font color="#E5BF00">รับตั๋ว</font><img src="<?php echo base_url('/images/ticket_ex.gif'); ?>" width="25px" height="25px">
                 </a>
               <?php } ?>
-              <a href="<?php echo base_url('/checking'); ?>" class="usrlist ps-3">
+              <a href="<?php echo base_url('/reservation'); ?>" class="usrlist ps-3">
                 <font color="#000000">การจอง</font>
               </a>
               <a href="<?php echo base_url('/history'); ?>" class="usrlist ps-3">

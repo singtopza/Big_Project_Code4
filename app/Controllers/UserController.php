@@ -7,6 +7,7 @@ use CodeIgniter\Controller;
 use App\Models\UsersModel;
 use App\Models\OTPModel;
 use App\Models\StationModel;
+use App\Models\SettingModel;
 
 class UserController extends Controller
 {
@@ -194,6 +195,24 @@ class UserController extends Controller
       $session->setFlashdata('swel_icon', $st_sw_icon_unlogin);
       $session->setFlashdata('swel_button', $st_sw_button_unlogin);
       return redirect()->to('/login');
+    }
+  }
+
+  public function delete_imgprofile()
+  {
+    $session = session();
+    $ses_userid = $session->get('ses_id');
+    $model = new UsersModel();
+    $data_model = $model->delete_imgprofile($ses_userid);
+    if ($data_model) {
+      return redirect()->to('/edit-form');
+    } else {
+      require_once(APPPATH . 'Controllers/components/setting.php');
+      $session->setFlashdata('swel_title', 'เกิดข้อผิดพลาด');
+      $session->setFlashdata('swel_text', 'ไม่สามารถดำเนินการลบรูปภาพโปรไฟล์นี้ได้ โปรดลองใหม่อีกครั้ง!');
+      $session->setFlashdata('swel_icon', 'error');
+      $session->setFlashdata('swel_button', 'ลองอีกครั้ง');
+      return redirect()->to('/edit-form');
     }
   }
 
@@ -451,10 +470,17 @@ class UserController extends Controller
     } else {
       $data_sending = [];
       require_once APPPATH . 'Libraries/vendor/autoload.php';
+
+      $model_setting = new SettingModel();
+      $data_setting = $model_setting->get_setting();
+      $fb_app_id = $data_setting->fb_app_id;
+      $fb_app_secret = $data_setting->fb_app_secret;
+      $fb_default_graph_version = $data_setting->fb_default_graph_version;
+
       $facebook = new \Facebook\Facebook([
-        'app_id' => $st_fb_app_id,
-        'app_secret' => $st_fb_app_secret,
-        'default_graph_version' => $st_fb_default_graph_version
+        'app_id' => $fb_app_id,
+        'app_secret' => $fb_app_secret,
+        'default_graph_version' => $fb_default_graph_version
       ]);
 
       $fb_helper = $facebook->getRedirectLoginHelper();
@@ -471,10 +497,17 @@ class UserController extends Controller
     $session = session();
     require_once(APPPATH . 'Controllers/components/setting.php');
     require_once APPPATH . 'Libraries/vendor/autoload.php';
+
+    $model_setting = new SettingModel();
+    $data_setting = $model_setting->get_setting();
+    $fb_app_id = $data_setting->fb_app_id;
+    $fb_app_secret = $data_setting->fb_app_secret;
+    $fb_default_graph_version = $data_setting->fb_default_graph_version;
+
     $facebook = new \Facebook\Facebook([
-      'app_id' => $st_fb_app_id,
-      'app_secret' => $st_fb_app_secret,
-      'default_graph_version' => $st_fb_default_graph_version
+      'app_id' => $fb_app_id,
+      'app_secret' => $fb_app_secret,
+      'default_graph_version' => $fb_default_graph_version
     ]);
 
     $fb_helper = $facebook->getRedirectLoginHelper();
@@ -499,9 +532,10 @@ class UserController extends Controller
       $model = new UsersModel();
       if (isset($fb_user_info['email']) && !empty($fb_user_info['email'])) {
         $email = $fb_user_info['email'];
+        $fbId = $fb_user_info['id'];
         $data_check_email = $model->count_data_login($email);
         if ($data_check_email >= 1) {
-          $data_login = $model->get_data_login_fb($email);
+          $data_login = $model->get_data_login_fb($email, $fbId);
           if ($data_login) {
             $user_id = $data_login['User_ID'];
             $update_login = $model->update_login($user_id);
@@ -519,36 +553,48 @@ class UserController extends Controller
             );
             setcookie("email", "", $arr_cookie_options_else);
             setcookie("password", "", $arr_cookie_options_else);
+
+            $model_setting = new SettingModel();
+            $data_setting = $model_setting->get_setting();
+            $session_timeout = $data_setting->session_timeout;
+
             $timestamp = time();
-            $timestamp = $timestamp + $st_ses_time_out;
-            $ses_data = [
-              'ses_id' => $user_id,
-              'ses_timestamp_kick' => $timestamp,
-            ];
+            $timestamp = $timestamp + $session_timeout;
+            if ($session_timeout == -1) {
+              $ses_data = [
+                'ses_id' => $user_id,
+                'ses_timestamp_kick' => -1,
+              ];
+            } else {
+              $ses_data = [
+                'ses_id' => $user_id,
+                'ses_timestamp_kick' => $timestamp,
+              ];
+            }
             $session->set($ses_data);
             $session->setFlashdata('swel_title', 'เข้าสู่ระบบสำเร็จแล้ว');
             $session->setFlashdata('swel_icon', 'success');
             $session->setFlashdata('swel_button', 'เข้าใช้งาน');
             return redirect()->to('/');
           } else {
-            $session->setFlashdata('msg', 'อีเมลดังกล่าวไม่ได้ถูกลงทะเบียนโดย Facebook!');
+            $session->setFlashdata('msg', 'อีเมลดังกล่าวไม่ได้ถูกลงทะเบียนโดย Facebook หรือมีบัญชีอื่นที่ใช้อีเมลนี้อยู่แล้ว!');
             return redirect()->to('/login');
           }
         } else {
           if (!empty($fb_user_info['id'])) {
             $data_facebook = [
-              'Pic' => $fb_user_info['id'],
               'F_Name' => $fb_user_info['first_name'],
               'L_Name' => $fb_user_info['last_name'],
               'Email' => $fb_user_info['email'],
               'Pos_ID' => '1',
+              'Last_Login' => time(),
               'Reg_Date' => time(),
-              'Facebook' => 'true',
+              'Facebook' => $fb_user_info['id'],
               'IP_Address' => $_SERVER['REMOTE_ADDR'],
             ];
             $save_user = $model->save($data_facebook);
             if ($save_user) {
-              $data_login = $model->get_data_login_fb($email);
+              $data_login = $model->get_data_login_fb($email, $fbId);
               if ($data_login) {
                 $user_id = $data_login['User_ID'];
                 $update_login = $model->update_login($user_id);
@@ -566,12 +612,24 @@ class UserController extends Controller
                 );
                 setcookie("email", "", $arr_cookie_options_else);
                 setcookie("password", "", $arr_cookie_options_else);
+
+                $model_setting = new SettingModel();
+                $data_setting = $model_setting->get_setting();
+                $session_timeout = $data_setting->session_timeout;
+    
                 $timestamp = time();
-                $timestamp = $timestamp + $st_ses_time_out;
-                $ses_data = [
-                  'ses_id' => $user_id,
-                  'ses_timestamp_kick' => $timestamp,
-                ];
+                $timestamp = $timestamp + $session_timeout;
+                if ($session_timeout == -1) {
+                  $ses_data = [
+                    'ses_id' => $user_id,
+                    'ses_timestamp_kick' => -1,
+                  ];
+                } else {
+                  $ses_data = [
+                    'ses_id' => $user_id,
+                    'ses_timestamp_kick' => $timestamp,
+                  ];
+                }
                 $session->set($ses_data);
                 $session->setFlashdata('swel_title', 'สำเร็จ!');
                 $session->setFlashdata('swel_text', 'สมัครสมาชิกสำเร็จแล้ว คุณสามารถลงชื่อเข้าใช้งานระบบได้ในขณะนี้');
@@ -622,61 +680,90 @@ class UserController extends Controller
     $rememberme = $this->request->getVar('rememberme');
     if (isset($email) && !empty($email) && isset($password) && !empty($password)) {
       $data = $model->get_data_login($email);
+      $arr_cookie_options = array(
+        'expires' => time() + 10 * 365 * 24 * 60 * 60,
+        'path' => '/',
+      );
+      $arr_cookie_options_else = array(
+        'path' => '/',
+      );
       if ($data) {
-        $user_id = $data['User_ID'];
-        $pass = $data['Pass'];
-        $verify_password = password_verify($password, $pass);
-        if ($verify_password) {
-          $update_login = $model->update_login($user_id);
-          if ($update_login) {
-            // ไม่ดำเนินการใดๆ
+        $data_model_count = $model->count_data_login($email);
+        if ($data_model_count >= 1) {
+          $data_login_fb_alert = $model->count_data_login_fb($email);
+          if ($data_login_fb_alert >= 1) {
+            $session->setFlashdata('msg', 'อีเมลนี้มีการลงทะเบียนโดย Facebook กับ I-Van แล้ว!');
+            return redirect()->to('/login');
           } else {
-            $session->setFlashdata('swel_title', 'เกิดข้อผิดพลาด!');
-            $session->setFlashdata('swel_text', 'ไม่สามารถปรับเปลี่ยนเวลาการเข้าสู่ระบบได้ โปรดติดต่อผู้ดูแลระบบ');
-            $session->setFlashdata('swel_icon', 'error');
-            $session->setFlashdata('swel_button', 'รับทราบ');
-            return redirect()->to('/');
+            $user_id = $data['User_ID'];
+            $pass = $data['Pass'];
+            $verify_password = password_verify($password, $pass);
+            if ($verify_password) {
+              $update_login = $model->update_login($user_id);
+              if ($update_login) {
+                // ไม่ดำเนินการใดๆ
+              } else {
+                $session->setFlashdata('swel_title', 'เกิดข้อผิดพลาด!');
+                $session->setFlashdata('swel_text', 'ไม่สามารถปรับเปลี่ยนเวลาการเข้าสู่ระบบได้ โปรดติดต่อผู้ดูแลระบบ');
+                $session->setFlashdata('swel_icon', 'error');
+                $session->setFlashdata('swel_button', 'รับทราบ');
+                return redirect()->to('/');
+              }
+
+              $model_setting = new SettingModel();
+              $data_setting = $model_setting->get_setting();
+              $session_timeout = $data_setting->session_timeout;
+  
+              $timestamp = time();
+              $timestamp = $timestamp + $session_timeout;
+              if ($session_timeout == -1) {
+                $ses_data = [
+                  'ses_id' => $user_id,
+                  'ses_timestamp_kick' => -1,
+                ];
+              } else {
+                $ses_data = [
+                  'ses_id' => $user_id,
+                  'ses_timestamp_kick' => $timestamp,
+                ];
+              }
+              if (!empty($rememberme)) {
+                setcookie("email", $email, $arr_cookie_options);
+                setcookie("password", $password, $arr_cookie_options);
+              } else {
+                setcookie("email", "", $arr_cookie_options_else);
+                setcookie("password", "", $arr_cookie_options_else);
+              }
+              $session->set($ses_data);
+              $session->setFlashdata('swel_title', 'เข้าสู่ระบบสำเร็จแล้ว');
+              $session->setFlashdata('swel_icon', 'success');
+              $session->setFlashdata('swel_button', 'เข้าใช้งาน');
+              return redirect()->to('/');
+            } else {
+              setcookie("email", $email, $arr_cookie_options_else);
+              setcookie("password", "", $arr_cookie_options_else);
+              $session->setFlashdata('msg', 'รหัสผ่านไม่ถูกต้อง!');
+            }
+            return redirect()->to('/login');
           }
-          $timestamp = time();
-          $timestamp = $timestamp + $st_ses_time_out;
-          $ses_data = [
-            'ses_id' => $user_id,
-            'ses_timestamp_kick' => $timestamp,
-          ];
-          if (!empty($rememberme)) {
-            $arr_cookie_options = array(
-              'expires' => time() + 10 * 365 * 24 * 60 * 60,
-              'path' => '/',
-            );
-            setcookie("email", $email, $arr_cookie_options);
-            setcookie("password", $password, $arr_cookie_options);
-          } else {
-            $arr_cookie_options_else = array(
-              'path' => '/',
-            );
-            setcookie("email", "", $arr_cookie_options_else);
-            setcookie("password", "", $arr_cookie_options_else);
-          }
-          $session->set($ses_data);
-          $session->setFlashdata('swel_title', 'เข้าสู่ระบบสำเร็จแล้ว');
-          $session->setFlashdata('swel_icon', 'success');
-          $session->setFlashdata('swel_button', 'เข้าใช้งาน');
-          return redirect()->to('/');
         } else {
-          $session->setFlashdata('msg', 'รหัสผ่านไม่ถูกต้อง!');
-        }
-        return redirect()->to('/login');
-      } else {
-        $data_login_fb_alert = $model->get_data_login_fb($email);
-        if ($data_login_fb_alert) {
-          $session->setFlashdata('msg', 'อีเมลนี้มีการลงทะเบียนโดย Facebook กับ ' . base_url('/') . ' แล้ว!');
-          return redirect()->to('/login');
-        } else {
+          setcookie("email", $email, $arr_cookie_options_else);
+          setcookie("password", "", $arr_cookie_options_else);
           $session->setFlashdata('msg', 'ไม่พบที่อยู่อีเมลนี้ในระบบ!');
           return redirect()->to('/login');
         }
+      } else {
+        setcookie("email", $email, $arr_cookie_options_else);
+        setcookie("password", "", $arr_cookie_options_else);
+        $session->setFlashdata('msg', 'ไม่พบที่อยู่อีเมลนี้ในระบบ!');
+        return redirect()->to('/login');
       }
     } else {
+      $arr_cookie_options_else = array(
+        'path' => '/',
+      );
+      setcookie("email", "", $arr_cookie_options_else);
+      setcookie("password", "", $arr_cookie_options_else);
       $session->setFlashdata('msg', 'โปรดกรอกข้อมูลให้ครบถ้วน ก่อนดำเนินการเข้าสู่ระบบ!');
       return redirect()->to('/login');
     }
@@ -755,14 +842,21 @@ class UserController extends Controller
         'rules' => 'required|min_length[5]|max_length[30]',
         'errors' => [
           'required' => 'โปรดระบุรหัสผ่าน!',
-          'min_length' => 'รหัสผ่านต้องมีอย่างน้อย 3 ตัวอักษร!',
+          'min_length' => 'รหัสผ่านต้องมีอย่างน้อย 5 ตัวอักษร!',
           'max_length' => 'รหัสผ่านต้องไม่เกิน 30 ตัวอักษร!',
         ],
       ],
       'confpassword' => [
-        'rules' => 'matches[password]',
+        'rules' => 'required|matches[password]',
         'errors' => [
+          'required' => 'โปรดยืนยันรหัสผ่าน!',
           'matches' => 'รหัสผ่านไม่ตรงกัน!',
+        ],
+      ],
+      'acceptrule' => [
+        'rules' => 'required',
+        'errors' => [
+          'required' => 'คุณจำเป็นต้องยอมรับ นโยบาย และข้อตกลงของเว็บไซต์!',
         ],
       ],
     ];
@@ -852,14 +946,14 @@ class UserController extends Controller
           'max_length' => 'โปรดระบุนามสกุลที่ความยาวไม่เกิน 25 ตัวอักษร',
         ],
       ],
-      'phone' => [
-        'rules' => 'required|min_length[10]|max_length[10]',
-        'errors' => [
-          'required' => 'โปรดระบุหมายเลขโทรศัพท์!',
-          'min_length' => 'เบอร์โทรติดต่อต้องมีจำนวน 10 ตัวอักษร!',
-          'max_length' => 'เบอร์โทรติดต่อต้องมีจำนวน 10 ตัวอักษร!',
-        ],
-      ],
+      // 'phone' => [
+      //   'rules' => 'required|min_length[10]|max_length[10]',
+      //   'errors' => [
+      //     'required' => 'โปรดระบุหมายเลขโทรศัพท์!',
+      //     'min_length' => 'เบอร์โทรติดต่อต้องมีจำนวน 10 ตัวอักษร!',
+      //     'max_length' => 'เบอร์โทรติดต่อต้องมีจำนวน 10 ตัวอักษร!',
+      //   ],
+      // ],
       'position' => [
         'rules' => 'required',
         'errors' => [
@@ -878,16 +972,16 @@ class UserController extends Controller
       ];
       $data_update_user = $model->update($user_id, $data);
       if ($data_update_user) {
-        $session->setFlashdata('swel_title_emp', 'สำเร็จ');
-        $session->setFlashdata('swel_text_emp', 'ข้อมูลของคุณได้รับการแก้ไขเรียบร้อยแล้ว!');
-        $session->setFlashdata('swel_icon_emp', 'success');
-        $session->setFlashdata('swel_button_emp', 'ตกลง');
+        $session->setFlashdata('swel_title', 'สำเร็จ');
+        $session->setFlashdata('swel_text', 'ข้อมูลของคุณได้รับการแก้ไขเรียบร้อยแล้ว!');
+        $session->setFlashdata('swel_icon', 'success');
+        $session->setFlashdata('swel_button', 'ตกลง');
         return redirect()->to('/manage-allUsers');
       } else {
-        $session->setFlashdata('swel_title_emp', 'เกิดข้อผิดพลาด');
-        $session->setFlashdata('swel_text_emp', 'ไม่สามารถบันทึกข้อมูลได้ โปรดติดต่อผู้ดูแลระบบ หรือลองใหม่อีกครั้ง');
-        $session->setFlashdata('swel_icon_emp', 'error');
-        $session->setFlashdata('swel_button_emp', 'ลองอีกครั้ง');
+        $session->setFlashdata('swel_title', 'เกิดข้อผิดพลาด');
+        $session->setFlashdata('swel_text', 'ไม่สามารถบันทึกข้อมูลได้ โปรดติดต่อผู้ดูแลระบบ หรือลองใหม่อีกครั้ง');
+        $session->setFlashdata('swel_icon', 'error');
+        $session->setFlashdata('swel_button', 'ลองอีกครั้ง');
         return redirect()->to('/manage-allUsers');
       }
     } else {
@@ -951,16 +1045,16 @@ class UserController extends Controller
       ];
       $data_user_save = $model->save($data);
       if ($data_user_save) {
-        $session->setFlashdata('swel_title_emp', 'สำเร็จ!');
-        $session->setFlashdata('swel_text_emp', 'ข้อมูลของผู้ใช้ได้ถูกเพิ่มลงระบบเรียบร้อยแล้ว');
-        $session->setFlashdata('swel_icon_emp', 'success');
-        $session->setFlashdata('swel_button_emp', 'รับทราบ');
+        $session->setFlashdata('swel_title', 'สำเร็จ!');
+        $session->setFlashdata('swel_text', 'ข้อมูลของผู้ใช้ได้ถูกเพิ่มลงระบบเรียบร้อยแล้ว');
+        $session->setFlashdata('swel_icon', 'success');
+        $session->setFlashdata('swel_button', 'รับทราบ');
         return redirect()->to('/add-officer');
       } else {
-        $session->setFlashdata('swel_title_emp', 'เกิดข้อผิดพลาด');
-        $session->setFlashdata('swel_text_emp', 'ไม่สามารถบันทึกข้อมูลได้ โปรดติดต่อผู้ดูแลระบบ หรือลองใหม่อีกครั้ง');
-        $session->setFlashdata('swel_icon_emp', 'error');
-        $session->setFlashdata('swel_button_emp', 'ลองอีกครั้ง');
+        $session->setFlashdata('swel_title', 'เกิดข้อผิดพลาด');
+        $session->setFlashdata('swel_text', 'ไม่สามารถบันทึกข้อมูลได้ โปรดติดต่อผู้ดูแลระบบ หรือลองใหม่อีกครั้ง');
+        $session->setFlashdata('swel_icon', 'error');
+        $session->setFlashdata('swel_button', 'ลองอีกครั้ง');
         return redirect()->to('/add-officer');
       }
     } else {
@@ -970,29 +1064,11 @@ class UserController extends Controller
     }
   }
 
-  // public function blockUrlImg($userIdImg)
-  // {
-  //   $session = session();
-  //   $ses_userid = $session->get('ses_id');
-  //   if (isset($ses_userid)) {
-  //     $session->setFlashdata('swel_title_emp', $userIdImg);
-  //     $session->setFlashdata('swel_text_emp', 'ไม่สามารถบันทึกข้อมูลได้ โปรดติดต่อผู้ดูแลระบบ หรือลองใหม่อีกครั้ง');
-  //     $session->setFlashdata('swel_icon_emp', 'error');
-  //     $session->setFlashdata('swel_button_emp', 'ลองอีกครั้ง');
-  //     return redirect()->to('/add-officer');
-  //   } else {
-  //     $session->setFlashdata('swel_title_emp', 'เกิดข้อผิดพลาด');
-  //     $session->setFlashdata('swel_text_emp', 'ไม่สามารถบันทึกข้อมูลได้ โปรดติดต่อผู้ดูแลระบบ หรือลองใหม่อีกครั้ง');
-  //     $session->setFlashdata('swel_icon_emp', 'error');
-  //     $session->setFlashdata('swel_button_emp', 'ลองอีกครั้ง');
-  //     return redirect()->to('/add-officer');
-  //   }
-  // }
-
   public function logout()
   {
     $session = session();
     $session->destroy();
     return redirect()->to('/login');
   }
+
 }

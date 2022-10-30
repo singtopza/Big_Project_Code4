@@ -19,7 +19,7 @@ class TicketModel extends Model
       ->join('reservation', 'payment.Reserve_ID = reservation.Reserve_ID ')
       ->join('station', 'station.Station_ID = reservation.Station_Start')
       ->where($where_sql)
-      ->orderby('Tick_ID', 'DESC')
+      ->orderby('tick_ID', 'DESC')
       ->get()
       ->getResultArray();
   }
@@ -49,7 +49,7 @@ class TicketModel extends Model
       ->join('van', 'dock_car.Van_ID = van.Van_ID')
       ->join('station', 'station.Station_ID = reservation.Station_Start')
       ->where($where_sql)
-      ->orderBy('Ticket.Tick_ID', 'DESC')
+      ->orderBy('ticket.Tick_ID', 'DESC')
       ->limit(1)
       ->get()
       ->getResultArray();
@@ -76,7 +76,7 @@ class TicketModel extends Model
       ->join('ticket_price', 'reservation.Tic_Price_ID = ticket_price.Tic_Price_ID')
       ->join('van', 'dock_car.Van_ID = van.Van_ID')
       ->where($where_sql)
-      ->orderBy('Ticket.Tick_ID', 'DESC')
+      ->orderBy('ticket.Tick_ID', 'DESC')
       ->limit(1)
       ->get()
       ->getResultArray();

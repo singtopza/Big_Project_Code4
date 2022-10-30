@@ -2,7 +2,6 @@
   $host = "localhost";
   // $username = "adminivan_ivan";
   // $password = "singtopza4112544";
-  // $database = "adminivan_ivan";
   $username = "root";
   $password = "";
   $database = "adminivan_ivan";

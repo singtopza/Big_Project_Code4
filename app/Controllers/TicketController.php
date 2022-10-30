@@ -6,6 +6,7 @@ use App\Models\UsersModel;
 use App\Models\PaymentModel;
 use App\Models\TicketModel;
 use App\Models\StationModel;
+use App\Models\SettingModel;
 
 class TicketController extends BaseController
 {
@@ -200,6 +201,11 @@ class TicketController extends BaseController
           $data_station_end = $model_station->getStationById_E($end_station);
           $name_station_end = $data_station_end['Station_Name'];
 
+          $model_setting = new SettingModel();
+          $data_setting = $model_setting->get_setting();
+          $otp_name = $data_setting->otp_sender;
+          $otp_token = $data_setting->otp_token;
+
           $curl = curl_init();
 
           curl_setopt_array($curl, array(
@@ -254,7 +260,7 @@ class TicketController extends BaseController
             if ($thsms_code == "422") {
               $session->setFlashdata('swel_text', 'จำนวนการส่ง SMS ของระบบหมดลงแล้ว โปรดรอการแก้ไข (' . $thsms_code . ')');
             } else if ($thsms_code == "404") {
-              $session->setFlashdata('swel_text', 'ไม่พบผู้ส่ง SMS ของระบบ โปรดรอการแก้ไข ('.$thsms_code.')');
+              $session->setFlashdata('swel_text', 'ไม่พบผู้ส่ง SMS ของระบบ โปรดรอการแก้ไข (' . $thsms_code . ')');
             } else {
               $session->setFlashdata('swel_text', $thsms_errors . ' (' . $thsms_code . ')');
             }

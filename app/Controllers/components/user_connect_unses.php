@@ -11,17 +11,17 @@
   $Q_Pos_ID = $data['Pos_ID'];
   $data_sending['Q_Pos_Name'] = $data['Pos_Name_TH'];
   $data_sending['Q_Facebook'] = $data['Facebook'];
-  if ($data['Facebook'] == 'true') {
-    if (str_contains($data['Pic'], '.')) {
-      $data_sending['Q_Picture'] = base_url('uploads/userProfile/' . $data['Pic']);
-    } else {
-      $data_sending['Q_Picture'] = "http://graph.facebook.com/".$data['Pic']."/picture";
-    }
-  } else {
-    if (isset($data['Pic'])) {
+  if ($data['Facebook'] == '' || $data['Facebook'] == null) {
+    if (isset($data['Pic']) && $data['Pic'] != null) {
       $data_sending['Q_Picture'] = base_url('uploads/userProfile/' . $data['Pic']);
     } else {
       $data_sending['Q_Picture'] = base_url('images/no-picture.png');
+    }
+  } else {
+    if (str_contains($data['Pic'], '.')) {
+      $data_sending['Q_Picture'] = base_url('uploads/userProfile/' . $data['Pic']);
+    } else {
+      $data_sending['Q_Picture'] = "http://graph.facebook.com/".$data['Facebook']."/picture";
     }
   }
 

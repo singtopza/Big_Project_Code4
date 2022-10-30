@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <title>I-Van เว็บไซต์สำหรับจองตั๋วรถตู้โดยสาร - เว็บไซต์เพื่อการศึกษา</title>
   <meta name="description" content="เว็บไซต์สำหรับการจองตั๋วรถตู้โดยสารสาธารณะ ของบริษัท กาญจนบุรีเอ็กซ์เพรส จำกัด">
-  <title>I-Van เว็บไซต์สำหรับจองตั๋วรถตู้โดยสาร</title>
   <?php require('components/header.php'); ?>
 </head>
 <body>
@@ -42,12 +42,12 @@
           </div>
           <div class="col-lg-2 col-6 my-2">
             <div class="input-group date">
-              <input type="date" id="index-date" onchange="input_select()" class="form-control form-control-index index-font-txt" name="date" value="<?php echo date("Y-m-d"); ?>" required disabled/>
+              <input type="date" id="date" onchange="input_select()" class="form-control form-control-index index-font-txt" name="date" value="<?php echo date("Y-m-d"); ?>" required disabled/>
             </div>
           </div>
           <div class="col-lg-2 col-6 my-2">
             <div class="input-group time">
-              <select id="index-time" class="form-select form-control-index index-font-txt" name="time" required disabled>
+              <select id="time" class="form-select form-control-index index-font-txt" name="time" required disabled>
                 <option class="hide-selected" value="">เวลา</option>
               </select>
             </div>
@@ -114,7 +114,7 @@
             </div>
             <div class="col-3"></div>
             <div class="col-9">
-              <p class="subtopic1">สามารถทำการจองตั๋วล่วงหน้าได้ 1-30 วัน ผ่านทางเว็บไซต์ได้ 24 ช.ม.</p>
+              <p class="subtopic1">สามารถทำการจองตั๋วล่วงหน้าได้ 1-3 วัน ผ่านทางเว็บไซต์ได้ 24 ช.ม.</p>
             </div>
           </div>
         </div>
@@ -140,13 +140,13 @@
   function input_select() {
     var start = document.getElementById("select-start-form").value;
     var end = document.getElementById("select-end-form").value;
-    var date = document.getElementById("index-date").value;
+    var date = document.getElementById("date").value;
     if (start == "" || end == "") {
-      document.getElementById("index-time").disabled = true;
-      document.getElementById("index-date").disabled = true;
+      document.getElementById("time").disabled = true;
+      document.getElementById("date").disabled = true;
     } else {
-      document.getElementById("index-time").disabled = false;
-      document.getElementById("index-date").disabled = false;
+      document.getElementById("time").disabled = false;
+      document.getElementById("date").disabled = false;
       if (start == end) {
         document.getElementById("select-start-form").value = '';
         document.getElementById("select-end-form").value = '';
@@ -167,10 +167,10 @@
         date: date
       },
       success: function(data) {
-        $('#index-time').html(data);
+        $('#time').html(data);
       },
       error() {
-        $('#index-time').html('An Error');
+        $('#time').html('An Error');
       }
     });
   }
@@ -179,19 +179,43 @@
   $(function(){
     var dtToday = new Date();
     var month = dtToday.getMonth() + 1;
-    var month2 = dtToday.getMonth() + 2;
+    var month2 = dtToday.getMonth() + 1;
     var day = dtToday.getDate();
+    var day2 = dtToday.getDate() + 3;
+
+    if(month < 10 && month > 0) {
+      month = '0' + month;
+    } else if (month > 12) {
+      month = '0' + 1;
+    } else {
+      month = month;
+    }
+
+    if(day < 10 && day > 0) {
+      day = '0' + day;
+    } else {
+      day = day;
+    }
+    if(day2 < 10 && day2 > 0) {
+      day2 = '0' + day2;
+    } else if (day2 > 30) {
+      if(month2 < 10 && month2 > 0) {
+        month2 = '0' + month2;
+      } else if (month2 > 12) {
+        month2 = '01';
+      } else {
+        month2 = month2+1;
+      }
+      day2 = '03';
+    } else {
+      day2 = day2;
+    }
     var year = dtToday.getFullYear();
-    if(month < 10 || month2 < 10)
-      month = '0' + month.toString();
-      month2 = '0' + month2.toString();
-    if(day < 10)
-      day = '0' + day.toString();
     var minDate = year + '-' + month + '-' + day;
-    var maxDate = year + '-' + month2 + '-' + day;
-    $('#index-date').attr({
-      'max': maxDate,
-      'min': minDate
+    var maxDate = year + '-' + month2 + '-' + day2;
+    $('#date').attr({
+      'min': minDate,
+      'max': maxDate
     });
   });
 </script>
