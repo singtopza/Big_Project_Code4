@@ -156,22 +156,46 @@
   }
 </script>
 <script>
-  $(function() {
+  $(function(){
     var dtToday = new Date();
     var month = dtToday.getMonth() + 1;
-    var month2 = dtToday.getMonth() + 2;
+    var month2 = dtToday.getMonth() + 1;
     var day = dtToday.getDate();
+    var day2 = dtToday.getDate() + 3;
+
+    if(month < 10 && month > 0) {
+      month = '0' + month;
+    } else if (month > 12) {
+      month = '0' + 1;
+    } else {
+      month = month;
+    }
+
+    if(day < 10 && day > 0) {
+      day = '0' + day;
+    } else {
+      day = day;
+    }
+    if(day2 < 10 && day2 > 0) {
+      day2 = '0' + day2;
+    } else if (day2 > 30) {
+      if(month2 < 10 && month2 > 0) {
+        month2 = '0' + month2;
+      } else if (month2 > 12) {
+        month2 = '01';
+      } else {
+        month2 = month2+1;
+      }
+      day2 = '03';
+    } else {
+      day2 = day2;
+    }
     var year = dtToday.getFullYear();
-    if (month < 10 || month2 < 10)
-      month = '0' + month.toString();
-    month2 = '0' + month2.toString();
-    if (day < 10)
-      day = '0' + day.toString();
     var minDate = year + '-' + month + '-' + day;
-    var maxDate = year + '-' + month2 + '-' + day;
+    var maxDate = year + '-' + month2 + '-' + day2;
     $('#input-date').attr({
-      'max': maxDate,
-      'min': minDate
+      'min': minDate,
+      'max': maxDate
     });
   });
 </script>
