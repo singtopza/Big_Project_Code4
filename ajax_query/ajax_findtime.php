@@ -21,7 +21,7 @@ require ('database.php');
       $rowfindtime = mysqli_num_rows($query);
       echo '<option value="" class="hide-selected">เวลา</option>';
       if ($rowfindtime <= 0) {
-        echo '<option value="" class="text-center">---> ไม่มีรอบรถเวลานี้ <---</option>';
+        echo '<option value="" class="text-center" disabled>---> ไม่มีรอบรถเวลานี้ <---</option>';
       }
       foreach ($query as $value) {
         $timeformat = date_create($value['Van_Out']);
@@ -38,7 +38,7 @@ require ('database.php');
       $rowfindtime = mysqli_num_rows($query);
       echo '<option value="" class="hide-selected">เวลา</option>';
       if ($rowfindtime <= 0) {
-        echo '<option value="" class="text-center">---> ไม่มีรอบรถเวลานี้ <---</option>';
+        echo '<option value="" class="text-center" disabled>---> ไม่มีรอบรถเวลานี้ <---</option>';
       }
       foreach ($query as $value) {
         $timeformat = date_create($value['Van_Out']);

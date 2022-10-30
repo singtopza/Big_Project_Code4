@@ -24,6 +24,7 @@ class ReservationController extends BaseController
     if (isset($ses_userid)) {
       $model = new UsersModel();
       require_once(APPPATH . 'Controllers/components/user_connect.php');
+      require_once(APPPATH . 'Controllers/components/setting.php');
       if(isset($first_station) && $first_station == "") {
         $session->setFlashdata('swel_title', 'โปรดระบุสถานีต้นทางเพื่อทำการจอง!');
         $session->setFlashdata('swel_button', 'ตกลง');
@@ -47,6 +48,7 @@ class ReservationController extends BaseController
       $model_station = new StationModel();
       $data_sending['station_getStations'] = $model_station->getStation();
       $data_sending['station_getStation_NK'] = $model_station->getStationNK();
+      $model_reservation = new ReservationModel();
       if(isset($first_station) && isset($end_station) && isset($time) && isset($date) && $date != null) {
         $data_station_start = $model_station->getStationById_S($first_station);
         $data_station_end = $model_station->getStationById_E($end_station);
@@ -67,13 +69,15 @@ class ReservationController extends BaseController
         $model_ticketprice = new TicketPriceModel();
         $data_tickpetprice_getPrice = $model_ticketprice->getTicketPriceById($first_station, $end_station);
         $session->setFlashdata('ticket_price', $data_tickpetprice_getPrice['Tic_Price']);
-        $model_reservation = new ReservationModel(); // link with DockCar
         $model_reservation->checkBeforeReservation($first_station, $time, $date);
         return redirect()->to('/reservation');
+      } else {
+        // มีการระบุข้อมูลการจองไว้ แต่ยังไม่ได้ยืนยัน หรือยกเลิก
+        $data_model_reservation = $model_reservation->getReservationWaitingAll($ses_userid);
+        session()->setFlashdata('has_beforce_reservation', $data_model_reservation);
+        return view('reservation', $data_sending);
       }
-      echo view('reservation', $data_sending);
     } else {
-      $session = session();
       $session->setFlashdata('swel_title', 'คุณจำเป็นต้องเข้าสู่ระบบ!');
       $session->setFlashdata('swel_text', 'โปรดเข้าสู่ระบบก่อนทำการจองตั๋ว');
       $session->setFlashdata('swel_icon', 'error');
@@ -91,7 +95,12 @@ class ReservationController extends BaseController
       $model = new UsersModel();
       require_once(APPPATH . 'Controllers/components/user_connect.php');
       $model_reservation = new ReservationModel();
-      $data_reservation = $model_reservation->getReservationForConfirm($ses_userid);
+      $radio_old_reserve = $this->request->getVar('r');
+      if (isset($radio_old_reserve) && !empty($radio_old_reserve)) {
+        $data_reservation = $model_reservation->getReservationForConfirm_ById($ses_userid, $radio_old_reserve);
+      } else {
+        $data_reservation = $model_reservation->getReservationForConfirm($ses_userid);
+      }
       foreach ($data_reservation as $value) {
         $data_sending['Reserve_ID'] = $value['Reserve_ID'];
         $data_sending['Van_Out'] = $value['Van_Out']." น.";
@@ -147,6 +156,7 @@ class ReservationController extends BaseController
       $total_price = ($select_chair*$tickpet_price);
       $model_reservation = new ReservationModel();
       $havechair = $model_reservation->checkBeforeReservation($first_station, $time, $date);
+      $session->setFlashdata('havechair', $havechair);
       if ($select_chair <= 0) {
         $session->setFlashdata('swel_title', 'เกิดข้อผิดพลาด');
         $session->setFlashdata('swel_text', 'โปรดเลือกจำนวนที่นั่งอย่างน้อย 1 ที่');
@@ -195,7 +205,7 @@ class ReservationController extends BaseController
       $Reserve_ID = $this->request->getVar('reId');
       $model_reservation = new ReservationModel();
       $confirm_Reservation = $model_reservation->confirmReservationById($ses_userid, $Reserve_ID);
-      $model_reservation->deleteReservationByIdWating($ses_userid);
+      $model_reservation->deleteReservationWaitingAll($ses_userid);
       if ($confirm_Reservation) {
         $session->setFlashdata('swel_title', 'ยืนยันการจองสำเร็จ');
         $session->setFlashdata('swel_icon', 'success');
@@ -220,9 +230,31 @@ class ReservationController extends BaseController
       $model_reservation = new ReservationModel();
       $delete_Reservation = $model_reservation->deleteReservationById($ses_userid, $Reserve_ID);
       if ($delete_Reservation) {
-        $session->setFlashdata('swel_title', 'ยกเลิกการจองสำเร็จ');
+        $session->setFlashdata('swel_title', 'ยกเลิกทั้งหมดสำเร็จ');
         $session->setFlashdata('swel_icon', 'success');
         $session->setFlashdata('swel_button', 'ดำเนินการต่อ');
+        return redirect()->to('/reservation');
+      } else {
+        $session->setFlashdata('swel_title', 'เกิดข้อมูลผิดพลาด');
+        $session->setFlashdata('swel_text', 'ไม่สามารถดำเนินการตามที่ร้องขอได้!');
+        $session->setFlashdata('swel_icon', 'error');
+        $session->setFlashdata('swel_button', 'ลองอีกครั้ง');
+        return redirect()->to('/reservation');
+      }
+    }
+  }
+
+  public function cancelAll()
+  {
+    $session = session();
+    $ses_userid = $session->get('ses_id');
+    if (isset($ses_userid)) {
+      $model_reservation = new ReservationModel();
+      $delete_Reservation = $model_reservation->deleteReservationWaitingAll($ses_userid);
+      if ($delete_Reservation) {
+        $session->setFlashdata('swel_title', 'ยกเลิกการจองสำเร็จ');
+        $session->setFlashdata('swel_icon', 'success');
+        $session->setFlashdata('swel_button', 'กลับไปยังการจอง');
         return redirect()->to('/reservation');
       } else {
         $session->setFlashdata('swel_title', 'เกิดข้อมูลผิดพลาด');

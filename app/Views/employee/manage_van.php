@@ -67,12 +67,12 @@
 </html>
 <script>
   $(document).ready(function() {
-    <?php if (session()->getFlashdata('swel_title_emp')) { ?>
+    <?php if (session()->getFlashdata('swel_title')) { ?>
       swal({
-        title: "<?= session()->getFlashdata('swel_title_emp') ?>",
-        text: "<?= session()->getFlashdata('swel_text_emp') ?>",
-        icon: "<?= session()->getFlashdata('swel_icon_emp') ?>",
-        button: "<?= session()->getFlashdata('swel_button_emp') ?>",
+        title: "<?= session()->getFlashdata('swel_title') ?>",
+        text: "<?= session()->getFlashdata('swel_text') ?>",
+        icon: "<?= session()->getFlashdata('swel_icon') ?>",
+        button: "<?= session()->getFlashdata('swel_button') ?>",
       });
     <?php } ?>
   });

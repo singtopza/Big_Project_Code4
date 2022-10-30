@@ -6,6 +6,8 @@ use App\Models\UsersModel;
 use App\Models\PaymentModel;
 use App\Models\ComplaintModel;
 use App\Models\DockCarModel;
+use App\Models\ReservationModel;
+use App\Models\StationModel;
 use App\Models\VanModel;
 
 class EmployeeController extends BaseController
@@ -20,13 +22,14 @@ class EmployeeController extends BaseController
       $model = new UsersModel();
       require_once(APPPATH . 'Controllers/components/user_connect.php');
       if ($Q_Pos_ID >= 3) {
-      $model_payment = new PaymentModel();
+        $model_payment = new PaymentModel();
         $data_sending['count_all_users'] = $model->count_all_users();
         $data_sending['count_all_payments'] = $model_payment->count_all_payments();
         $data_sending['count_all_payments_success'] = $model_payment->count_all_payments_success();
         $data_sending['count_all_payments_waiting'] = $model_payment->count_all_payments_waiting();
         $data_sending['count_all_payments_day'] = $model_payment->count_all_payments_day();
-        $data_sending['allreservations'] = $model_payment->viewPaymentAll();
+        $data_sending['allreservations'] = $model_payment->viewPaymentAll()->paginate(10);
+        $data_sending['pager'] = $model_payment->pager;
         $data_payment_day = $model_payment->sum_price_day();
         foreach ($data_payment_day as $value) {
           if (isset($value['sumTotalPrice']) && !empty($value['sumTotalPrice'])) {
@@ -81,8 +84,8 @@ class EmployeeController extends BaseController
         $model = new UsersModel();
         $data = $model->where('User_ID', $ses_userid)->first();
         $data_sending['Q_F_Name'] = $data['F_Name'];
-        $session->setFlashdata('swel_title_emp', "ยินดีต้อนรับ ".$data_sending['Q_F_Name']);
-        $session->setFlashdata('swel_button_emp', 'เข้าใช้งาน');
+        $session->setFlashdata('swel_title', "ยินดีต้อนรับ ".$data_sending['Q_F_Name']);
+        $session->setFlashdata('swel_button', 'เข้าใช้งาน');
         return redirect()->to('/dashboard');
       } else {
         $session->setFlashdata('swel_title', $st_sw_title_blockpage);
@@ -173,7 +176,8 @@ class EmployeeController extends BaseController
       $model = new UsersModel();
       require_once(APPPATH . 'Controllers/components/user_connect.php');
       if ($Q_Pos_ID >= 3) {
-      $data_sending['list_users'] = $model->viewAll_Users_1();
+      $data_sending['list_users'] = $model->viewAll_Users_1()->paginate(10);
+      $data_sending['pager'] = $model->pager;
         return view('employee/manage_user', $data_sending);
       } else {
         $session->setFlashdata('swel_title', $st_sw_title_blockpage);
@@ -205,36 +209,6 @@ class EmployeeController extends BaseController
         $data_sending['listPaymentAll'] = $model_payment->viewPaymentAll_waiting();
         $data_sending['listPaymentAll_row'] = $model_payment->viewPaymentAll_waiting_row();
         return view('employee/check_payment', $data_sending);
-      } else {
-        $session->setFlashdata('swel_title', $st_sw_title_blockpage);
-        $session->setFlashdata('swel_text', $st_sw_text_blockpage);
-        $session->setFlashdata('swel_icon', $st_sw_icon_blockpage);
-        $session->setFlashdata('swel_button', $st_sw_button_blockpage);
-        return redirect()->to('/');
-      }
-    } else {
-      $session->setFlashdata('swel_title', $st_sw_title_unlogin);
-      $session->setFlashdata('swel_text', $st_sw_text_unlogin);
-      $session->setFlashdata('swel_icon', $st_sw_icon_unlogin);
-      $session->setFlashdata('swel_button', $st_sw_button_unlogin);
-      return redirect()->to('/login');
-    }
-  }
-
-  public function manage_complaint()
-  {
-    $session = session();
-    require_once(APPPATH . 'Controllers/components/setting.php');
-    $ses_userid = $session->get('ses_id');
-    $data_sending = [];
-    if (isset($ses_userid)) {
-      $model = new UsersModel();
-      require_once(APPPATH . 'Controllers/components/user_connect.php');
-      if ($Q_Pos_ID >= 3) {
-        $model_complaint = new ComplaintModel();
-        $data_sending['all_complaint_row'] = $model_complaint->view_all_complaint_row();
-        $data_sending['all_complaint'] = $model_complaint->view_all_complaint();
-        return view('employee/manage_complaint', $data_sending);
       } else {
         $session->setFlashdata('swel_title', $st_sw_title_blockpage);
         $session->setFlashdata('swel_text', $st_sw_text_blockpage);

@@ -12,12 +12,11 @@ class VanController extends BaseController
     $session = session();
     require_once(APPPATH . 'Controllers/components/setting.php');
     $ses_userid = $session->get('ses_id');
-    $ses_posid = $session->get('ses_pos_id');
     $data_sending = [];
     if (isset($ses_userid)) {
-      if ($ses_posid >= 2) {
       $model = new UsersModel();
       require_once(APPPATH . 'Controllers/components/user_connect.php');
+      if ($Q_Pos_ID >= 2) {
       $data_sending['driverlist'] = $model->driver_list();
         return view('employee/addvan', $data_sending);
       } else {
@@ -79,10 +78,10 @@ class VanController extends BaseController
           'Seats_Num' => $this->request->getVar('seats'),
         ];
         $model_van->save($data);
-        $session->setFlashdata('swel_title_emp', 'สำเร็จ!');
-        $session->setFlashdata('swel_text_emp', 'ข้อมูลของรถตู้โดยสารถูกเพิ่มลงระบบเรียบร้อยแล้ว');
-        $session->setFlashdata('swel_icon_emp', 'success');
-        $session->setFlashdata('swel_button_emp', 'รับทราบ');
+        $session->setFlashdata('swel_title', 'สำเร็จ!');
+        $session->setFlashdata('swel_text', 'ข้อมูลของรถตู้โดยสารถูกเพิ่มลงระบบเรียบร้อยแล้ว');
+        $session->setFlashdata('swel_icon', 'success');
+        $session->setFlashdata('swel_button', 'รับทราบ');
         return redirect()->to('/addvan');
       } else {
         $validation = $this->validator->listErrors();
@@ -143,10 +142,10 @@ class VanController extends BaseController
           'Seats_Num' => $this->request->getVar('seats'),
         ];
         $model_van->update($van_id, $data);
-        $session->setFlashdata('swel_title_emp', 'สำเร็จ!');
-        $session->setFlashdata('swel_text_emp', 'แก้ไขข้อมูลของรถตู้โดยสารลงระบบเรียบร้อยแล้ว');
-        $session->setFlashdata('swel_icon_emp', 'success');
-        $session->setFlashdata('swel_button_emp', 'โอเคร!!');
+        $session->setFlashdata('swel_title', 'สำเร็จ!');
+        $session->setFlashdata('swel_text', 'แก้ไขข้อมูลของรถตู้โดยสารลงระบบเรียบร้อยแล้ว');
+        $session->setFlashdata('swel_icon', 'success');
+        $session->setFlashdata('swel_button', 'โอเคร!!');
         return redirect()->to('/manage-van');
       } else {
         $validation = $this->validator->listErrors();
@@ -168,10 +167,11 @@ class VanController extends BaseController
     $session = session();
     require_once(APPPATH . 'Controllers/components/setting.php');
     $ses_userid = $session->get('ses_id');
-    $ses_posid = $session->get('ses_pos_id');
     $data_sending = [];
     if (isset($ses_userid)) {
-      if ($ses_posid >= 2) {
+      $model = new UsersModel();
+      require_once(APPPATH . 'Controllers/components/user_connect.php');
+      if ($Q_Pos_ID >= 2) {
       $model = new UsersModel();
       require_once(APPPATH . 'Controllers/components/user_connect.php');
       $data_sending['driverlist'] = $model->driver_list();
@@ -190,10 +190,10 @@ class VanController extends BaseController
             }
             return view('employee/edit_van', $data_sending);
           } else {
-            $session->setFlashdata('swel_title_emp', 'ไม่พบข้อมูล!');
-            $session->setFlashdata('swel_text_emp', 'ข้อมูลที่ได้รับ ไม่มีอยู่ในฐานข้อมูลของระบบ');
-            $session->setFlashdata('swel_icon_emp', 'error');
-            $session->setFlashdata('swel_button_emp', 'ตกลง');
+            $session->setFlashdata('swel_title', 'ไม่พบข้อมูล!');
+            $session->setFlashdata('swel_text', 'ข้อมูลที่ได้รับ ไม่มีอยู่ในฐานข้อมูลของระบบ');
+            $session->setFlashdata('swel_icon', 'error');
+            $session->setFlashdata('swel_button', 'ตกลง');
             return redirect()->to('/manage-van');
           }
         }

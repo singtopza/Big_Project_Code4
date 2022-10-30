@@ -179,13 +179,26 @@ class PaymentModel extends Model {
 
   public function viewPaymentAll()
   {
+    $this->builder()
+      // ->table('payment') // if use builder, hide table!
+      ->join('users', 'users.User_ID = payment.User_ID')
+      ->join('reservation', 'reservation.Reserve_ID = payment.Reserve_ID')
+      ->join('dock_car', 'dock_car.Dock_car_id = reservation.Dock_car_id')
+      ->orderBy('Pay_ID', 'DESC');
+      // hide get and getResultArray when use pagination!
+      // ->get()
+      // ->getResultArray();
+      return $this;
+  }
+
+  public function viewPaymentAll_PDF()
+  {
     return $this->db
       ->table('payment')
       ->join('users', 'users.User_ID = payment.User_ID')
       ->join('reservation', 'reservation.Reserve_ID = payment.Reserve_ID')
       ->join('dock_car', 'dock_car.Dock_car_id = reservation.Dock_car_id')
       ->orderBy('Pay_ID', 'DESC')
-      ->limit(20)
       ->get()
       ->getResultArray();
   }
@@ -199,6 +212,37 @@ class PaymentModel extends Model {
       ->join('dock_car', 'dock_car.Dock_car_id = reservation.Dock_car_id')
       ->join('van', 'van.Van_ID = dock_car.Van_ID')
       ->where('Pay_ID', $Pay_ID)
+      ->get()
+      ->getResultArray();
+  }
+
+  public function view_all_around_byReservation_G()
+  {
+    $where_sql = "payment.confirm = 'success'";
+    return $this->db
+      ->table('payment')
+      ->select('*')
+      ->selectSum('Re_Seate', 'sum_re')
+      ->selectCount('reservation.User_ID', 'count_re')
+      ->join('reservation', 'reservation.Reserve_ID = payment.Reserve_ID')
+      ->join('dock_car', 'dock_car.Dock_car_id = reservation.Dock_car_id')
+      ->join('van', 'van.Van_ID = dock_car.Van_ID')
+      ->where($where_sql)
+      ->groupBy('Reserve_Code')
+      ->orderBy('Go_Date', 'DESC')
+      ->get()
+      ->getResultArray();
+  }
+
+  public function view_all_around_byReservation()
+  {
+    $where_sql = "payment.confirm = 'success'";
+    return $this->db
+      ->table('payment')
+      ->join('reservation', 'reservation.Reserve_ID = payment.Reserve_ID')
+      ->join('users', 'users.User_ID = reservation.User_ID')
+      ->join('ticket_price', 'ticket_price.Tic_Price_ID = reservation.Tic_Price_ID')
+      ->where($where_sql)
       ->get()
       ->getResultArray();
   }

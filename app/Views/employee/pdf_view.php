@@ -109,3 +109,15 @@
 </body>
 
 </html>
+<script>
+  $(document).ready(function() {
+    <?php if (session()->getFlashdata('swel_title')) { ?>
+      swal({
+        title: "<?= session()->getFlashdata('swel_title') ?>",
+        text: "<?= session()->getFlashdata('swel_text') ?>",
+        icon: "<?= session()->getFlashdata('swel_icon') ?>",
+        button: "<?= session()->getFlashdata('swel_button') ?>",
+      });
+    <?php } ?>
+  });
+</script>

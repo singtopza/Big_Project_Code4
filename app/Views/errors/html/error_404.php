@@ -1,4 +1,4 @@
-<!-- <script type=\"text/javascript\">window.location.href = '".base_url()."';</script>; -->
+<?php echo "<script type=\"text/javascript\">window.location.href = '".base_url()."';</script>;"; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

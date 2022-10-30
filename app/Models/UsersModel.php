@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use phpDocumentor\Reflection\Types\Null_;
+use PHPUnit\Framework\Constraint\IsNull;
 
 class UsersModel extends Model {
 
@@ -12,7 +14,7 @@ class UsersModel extends Model {
 
   public function get_data_login($email) 
   {
-    $where_sql = "Email = '$email' AND (Facebook is null OR Facebook = 'false')";
+    $where_sql = "Email = '$email'";
     $data = $this
       ->table('users')
       ->where($where_sql)
@@ -22,9 +24,9 @@ class UsersModel extends Model {
     return $data;
   }
 
-  public function get_data_login_fb($email) 
+  public function get_data_login_fb($email, $fbId) 
   {
-    $where_sql = "Email = '$email' AND Facebook = 'true'";
+    $where_sql = "Email = '$email' AND Facebook = '$fbId'";
     $data = $this
       ->table('users')
       ->where($where_sql)
@@ -36,9 +38,18 @@ class UsersModel extends Model {
 
   public function count_data_login($email) 
   {
-    return $this
+    return $this->db
       ->table('users')
       ->where('Email', $email)
+      ->countAllResults();
+  }
+
+  public function count_data_login_fb($email) 
+  {
+    $where_sql = "Email = '$email' AND Facebook IS NOT NULL";
+    return $this->db
+      ->table('users')
+      ->where($where_sql)
       ->countAllResults();
   }
 
@@ -96,12 +107,10 @@ class UsersModel extends Model {
 
   public function viewAll_Users_1()
   {
-    return $this->db
-      ->table('users')
+    $this->builder()
       ->where('Pos_ID', 1)
-      ->orderBy('User_ID', 'ASC')
-      ->get()
-      ->getResultArray();
+      ->orderBy('User_ID', 'ASC');
+    return $this;
   }
 
   public function count_all_users()
@@ -146,5 +155,14 @@ class UsersModel extends Model {
       ->table('users')
       ->where($where_sql)
       ->countAllResults();
+  }
+
+  public function delete_imgprofile($userId)
+  {
+    return $this->db
+    ->table('users')
+    ->set('Pic', null)
+    ->where('User_ID', $userId)
+    ->update();
   }
 }

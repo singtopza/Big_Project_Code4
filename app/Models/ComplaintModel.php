@@ -18,10 +18,8 @@ class ComplaintModel extends Model {
 
   public function view_all_complaint()
   {
-    return $this->db
-      ->table('complaint')
-      ->orderBy('Com_ID', 'DESC')
-      ->get()
-      ->getResultArray();
+    $this->builder()
+      ->orderBy('Com_ID', 'DESC');
+    return $this;
   }
 }

@@ -13,6 +13,69 @@
       <h1>จองตั๋วรถตู้</h1>
     </div>
   </center>
+
+  <?php if (session()->getFlashdata('has_beforce_reservation')) { ?>
+    <!-- Modal -->
+    <div class="modal fade" id="model_beforce_reservation" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">คุณมีการจองที่ยังไม่ได้ยืนยัน!</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <?php
+            $has_beforce_reservation = session()->getFlashdata('has_beforce_reservation');
+            foreach ($has_beforce_reservation as $value) { ?>
+              <div class="row mb-4">
+                <div class="col-1">
+                  <input type="radio" id="radio_old_reserve_<?= $value['Reserve_ID']; ?>" class="radio_modal_reservaion mt-2" name="radio_old_reserve" value="<?= $value['Reserve_ID']; ?>" required>
+                </div>
+                <div class="col-11">
+                  <?php
+                  $dateReserve = $value['Re_DateTime'];
+                  $dateReserve = date_create($dateReserve);
+                  $dateReserveFormat = date_format($dateReserve, "วันที่ d/m/Y เวลา H:i น.");
+                  $goDate = $value['Go_Date'];
+                  $goDate = date_create($goDate);
+                  $goDateFormat = date_format($goDate, "วันที่ d/m/Y");
+                  $vanOut = $value['Van_Out'];
+                  $vanOut = date_create($vanOut);
+                  $vanOutFormat = date_format($vanOut, "เวลา H:i น.");
+                  ?>
+                  <label for="radio_old_reserve_<?= $value['Reserve_ID']; ?>"><strong>หมายเลข :</strong> <?= $value['Reserve_Code']; ?></label><br />
+                  <?php
+                  foreach ($station_getStations as $station_value) {
+                    if ($station_value['Station_ID'] == $value['Station_Start']) {
+                      $station_start_name = $station_value['Station_Name'];
+                    }
+                    if ($station_value['Station_ID'] == $value['Station_End']) {
+                      $station_end_name = $station_value['Station_Name'];
+                    }
+                  }
+                  ?>
+                  <label for="radio_old_reserve_<?= $value['Reserve_ID']; ?>"><strong>สถานี :</strong> <?= $station_start_name . " ไปยัง " . $station_end_name; ?></label><br />
+                  <label for="radio_old_reserve_<?= $value['Reserve_ID']; ?>"><strong>รอบรถ :</strong> <?php echo $goDateFormat . " " . $vanOutFormat; ?></label><br />
+                  <label for="radio_old_reserve_<?= $value['Reserve_ID']; ?>" class="fs12 text-secondary fst-italic">วันเวลาที่ทำการจอง : <?php echo $dateReserveFormat; ?></label><br />
+                </div>
+              </div>
+            <?php } ?>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ภายหลัง</button>
+            <a href="<?php echo base_url('/ReservationController/cancelAll'); ?>" class="btn btn-danger">ยกเลิกทั้งหมด</a>
+            <a href="<?php echo base_url('/confirm-reservation?r=') . $value['Reserve_ID']; ?>" id="a-connect-modal-conreserve" class="btn btn-success">ดำเนินการ<a />
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      $(window).on('load', function() {
+        $('#model_beforce_reservation').modal('show');
+      });
+    </script>
+  <?php } ?>
+
   <div class="row mx-0">
     <div class="col-1"></div>
     <div class="col-10">
@@ -178,7 +241,7 @@
                           <option value="<?php echo $x; ?>"><?php echo $x; ?></option>;
                         <?php } ?>
                       <?php } else { ?>
-                        <option value="" class="text-center" disabled="disabled">---> ไม่มีที่นั่งว่าง <---</option>
+                        <option value="" class="text-center" disabled>---> กรุณาเลือกวันเวลาที่ต้องการจอง <---</option>
                           <?php } ?>
                     </select>
                   </div>
@@ -214,7 +277,7 @@
     </div>
     <div class="col-1"></div>
     <center>
-      <button type="submit" class="nav-link btn-logreg-confirm" style="width:200px;">ยืนยันการจอง</button>
+      <button type="submit" id="con_page_reservation" class="nav-link btn-logreg-confirm" style="width:200px;" onclick="checksubmit()">ยืนยันการจอง</button>
     </center>
   </div>
   </form>
@@ -222,6 +285,50 @@
 </body>
 
 </html>
+<script>
+  function checksubmit() {
+    var start = document.getElementById("select-start-form").value;
+    var end = document.getElementById("select-end-form").value;
+    var go_date = document.getElementById("date").value;
+    var go_time = document.getElementById("time").value;
+    var chair = document.getElementById("select-chair").value;
+    if (start == "" || start == null) {
+      var msg_start = "ต้นทาง ";
+    } else {
+      var msg_start = "";
+    }
+    if (end == "" || end == null) {
+      var msg_end = "ปลายทาง ";
+    } else {
+      var msg_end = "";
+    }
+    if (go_date == "" || go_date == null) {
+      var msg_date = "วันที่ ";
+    } else {
+      var msg_date = "";
+    }
+    if (go_time == "" || go_time == null) {
+      var msg_time = "เวลา ";
+    } else {
+      var msg_time = "";
+    }
+    if (chair == "" || chair == null) {
+      var msg_chair = "จำนวนที่นั่ง ";
+    } else {
+      var msg_chair = "";
+    }
+    if (msg_start == "" && msg_end == "" && msg_date == "" && msg_time == "" && msg_chair == "") {
+
+    } else {
+      swal({
+          title: "โปรดกรอกข้อมูลให้ครบถ้วน!",
+          text: "โปรดเลือก " + msg_start + msg_end + msg_date + msg_time + msg_chair + "ก่อนทำการจอง!",
+          icon: "warning",
+          button: "รับทราบ",
+      });
+    }
+  }
+</script>
 <script>
   $(document).ready(function() {
     <?php if (session()->getFlashdata('swel_title')) { ?>
@@ -232,29 +339,42 @@
         button: "<?= session()->getFlashdata('swel_button') ?>",
       });
     <?php } ?>
-    $(document).ready(function() {
-      var start = document.getElementById("select-start-form").value;
-      var end = document.getElementById("select-end-form").value;
-      if (start == 0 || end == 0) {
-        document.getElementById("time").disabled = true;
-        document.getElementById("date").disabled = true;
-      } else {
-        document.getElementById("time").disabled = false;
-        document.getElementById("date").disabled = false;
-        if (start == end) {
-          document.getElementById("select-start-form").value = '';
-          document.getElementById("select-end-form").value = '';
-          swal({
-            title: "เกิดข้อผิดพลาด",
-            text: "ไม่สามารถเลือกต้นทาง และปลายทางซ้ำกันได้!",
-            icon: "error",
-            button: "รับทราบ",
-          });
-        }
-      }
-    });
-  });
 
+    var start = document.getElementById("select-start-form").value;
+    var end = document.getElementById("select-end-form").value;
+    if (start == 0 || end == 0) {
+      document.getElementById("time").disabled = true;
+      document.getElementById("date").disabled = true;
+    } else {
+      document.getElementById("time").disabled = false;
+      document.getElementById("date").disabled = false;
+      if (start == end) {
+        document.getElementById("select-start-form").value = '';
+        document.getElementById("select-end-form").value = '';
+        swal({
+          title: "เกิดข้อผิดพลาด",
+          text: "ไม่สามารถเลือกต้นทาง และปลายทางซ้ำกันได้!",
+          icon: "error",
+          button: "รับทราบ",
+        });
+      }
+    }
+  });
+</script>
+<script>
+  /* เริ่มต้น -- จับค่าใน Radio in Modal */
+  var radio = document.querySelectorAll(".radio_modal_reservaion");
+
+  function checkBox(e) {
+    var a = document.getElementById('a-connect-modal-conreserve');
+    a.href = "<?php echo base_url('/confirm-reservation?r='); ?>" + e.target.value;
+  }
+  radio.forEach(check => {
+    check.addEventListener("click", checkBox);
+  });
+  /* สิ้นสุด -- จับค่าใน Radio in Modal */
+</script>
+<script>
   function changetime(selTag) {
     var time = selTag.options[selTag.selectedIndex].text;
     if (time >= 1) {
@@ -301,7 +421,7 @@
             havechair += "<option value=" + num + ">" + num + "</option>";
           }
         } else {
-          havechair += "<option value=\"\" class=\"text-center\" disabled=\"disabled\">---> ไม่มีที่นั่งว่าง <---</option>";
+          havechair += "<option value=\"\" class=\"text-center\" disabled>---> ไม่มีที่นั่งว่าง <---</option>";
         }
         document.getElementById("select-chair").innerHTML = havechair;
       },
@@ -356,7 +476,11 @@
             havechair += "<option value=" + num + ">" + num + "</option>";
           }
         } else {
-          havechair += "<option value=\"\" disabled=\"disabled\">---> โปรดเลือกเวลาที่ต้องการจอง <---</option>";
+          if (go_dock == null || go_dock == "") {
+            havechair += "<option value=\"\" class=\"text-center\" disabled>---> กรุณาเลือกวันเวลาที่ต้องการจอง <---</option>";
+          } else {
+            havechair += "<option value=\"\" class=\"text-center\" disabled>---> ไม่มีที่นั่งว่าง <---</option>";
+          }
         }
         document.getElementById("select-chair").innerHTML = havechair;
       },
@@ -468,19 +592,43 @@
   $(function() {
     var dtToday = new Date();
     var month = dtToday.getMonth() + 1;
-    var month2 = dtToday.getMonth() + 2;
+    var month2 = dtToday.getMonth() + 1;
     var day = dtToday.getDate();
+    var day2 = dtToday.getDate() + 3;
+
+    if (month < 10 && month > 0) {
+      month = '0' + month;
+    } else if (month > 12) {
+      month = '01';
+    } else {
+      month = month;
+    }
+
+    if (day < 10 && day > 0) {
+      day = '0' + day;
+    } else {
+      day = day;
+    }
+    if (day2 < 10 && day2 > 0) {
+      day2 = '0' + day2;
+    } else if (day2 > 30) {
+      if (month2 < 10 && month2 > 0) {
+        month2 = '0' + month2;
+      } else if (month2 > 12) {
+        month2 = '01'
+      } else {
+        month2 = month2+1;
+      }
+      day2 = '03';
+    } else {
+      day2 = day2;
+    }
     var year = dtToday.getFullYear();
-    if (month < 10 || month2 < 10)
-      month = '0' + month.toString();
-    month2 = '0' + month2.toString();
-    if (day < 10)
-      day = '0' + day.toString();
     var minDate = year + '-' + month + '-' + day;
-    var maxDate = year + '-' + month2 + '-' + day;
+    var maxDate = year + '-' + month2 + '-' + day2;
     $('#date').attr({
-      'max': maxDate,
-      'min': minDate
+      'min': minDate,
+      'max': maxDate
     });
   });
 </script>

@@ -36,6 +36,7 @@ $routes->setAutoRoute(true);
 $routes->get('manage-allUsers', 'AdminController::manage_allUsers');
 $routes->get('add-officer', 'AdminController::add_officer');
 $routes->get('edit-officer/(:any)', 'AdminController::edit_officer/$1');
+$routes->get('setting', 'SettingController::setting');
 
 // Employee
 $routes->get('dashboard', 'EmployeeController::dashboard');
@@ -43,7 +44,6 @@ $routes->get('manage-user', 'EmployeeController::manage_user');
 $routes->get('manage-van', 'EmployeeController::manage_van');
 $routes->get('manage-traffic', 'EmployeeController::manage_traffic');
 $routes->get('check-payment', 'EmployeeController::check_payment');
-$routes->get('manage-complaint', 'EmployeeController::manage_complaint');
 $routes->get('add-user', 'EmployeeController::add_user');
 
 // User
@@ -75,6 +75,7 @@ $routes->get('edit-driving/(:any)', 'DockCarController::edit_driving/$1');
 
 // Payment
 $routes->get('payment', 'PaymentController::payment');
+$routes->get('around', 'PaymentController::manage_around');
 
 // Van
 $routes->get('addvan', 'VanController::addvan');
@@ -87,13 +88,11 @@ $routes->get('ticket/(:any)', 'TicketController::print_ticket/$1');
 
 // Complaint
 $routes->get('complaint', 'ComplaintController::complaint');
+$routes->get('manage-complaint', 'ComplaintController::manage_complaint');
 
 // PDF
 $routes->get('create-pdf', 'PdfController::index');
 $routes->get('ducument/view-pdf', 'PdfController::view_pdf');
-
-// Block
-$routes->get('uploads/userProfile/(:any)', 'UserController::blockUrlImg/$1');
 
 /*
  * --------------------------------------------------------------------

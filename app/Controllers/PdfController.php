@@ -26,7 +26,7 @@ class PdfController extends Controller
         $data_sending['count_all_payments_success'] = $model_payment->count_all_payments_success();
         $data_sending['count_all_payments_waiting'] = $model_payment->count_all_payments_waiting();
         $data_sending['count_all_payments_day'] = $model_payment->count_all_payments_day();
-        $data_sending['allreservations'] = $model_payment->viewPaymentAll();
+        $data_sending['allreservations'] = $model_payment->viewPaymentAll_PDF();
         $data_payment_day = $model_payment->sum_price_day();
         foreach ($data_payment_day as $value) {
           if (isset($value['sumTotalPrice']) && !empty($value['sumTotalPrice'])) {
@@ -84,7 +84,7 @@ class PdfController extends Controller
         $data_sending['count_all_payments_success'] = $model_payment->count_all_payments_success();
         $data_sending['count_all_payments_waiting'] = $model_payment->count_all_payments_waiting();
         $data_sending['count_all_payments_day'] = $model_payment->count_all_payments_day();
-        $data_sending['allreservations'] = $model_payment->viewPaymentAll();
+        $data_sending['allreservations'] = $model_payment->viewPaymentAll_PDF();
         $data_payment_day = $model_payment->sum_price_day();
         foreach ($data_payment_day as $value) {
           if (isset($value['sumTotalPrice']) && !empty($value['sumTotalPrice'])) {

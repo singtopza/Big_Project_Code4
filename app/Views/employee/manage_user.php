@@ -4,6 +4,30 @@
 <head>
   <title>I-Van</title>
   <?php require_once(APPPATH . 'Views/components_emp/header.php'); ?>
+  <style>
+    ul.pagination li a {
+      border: 2px solid #FFC758;
+      border-radius: 10px;
+      padding: 0px 20px 0px 20px;
+      margin-right: 3px;
+      color: black;
+      text-decoration: none;
+    }
+
+    ul.pagination li a:hover {
+      background-color: wheat;
+      border: 2px solid #FFC758;
+      border-radius: 10px;
+      padding: 0px 20px 0px 20px;
+      margin-right: 3px;
+      color: black;
+      text-decoration: none;
+    }
+
+    .active a {
+      background-color: #FFC758;
+    }
+  </style>
 </head>
 
 <body>
@@ -16,6 +40,7 @@
           <h4 class="text-center my-5">จัดการลูกค้า</h4>
         </div>
         <div class="tabcard_em px-4">
+        <?= $pager->links(); ?>
           <center>
             <table class="mange-table table tb-dash-table table-borderless table-hover">
               <thead>
@@ -36,28 +61,34 @@
                     </div>
                   </td>
                   <td class="mange-td">
-                    <label class="form-check-label" for="del_m_user_<?= $value['User_ID']; ?>"><?= $value['User_ID']; ?><label>
+                    <label class="form-check-label" for="del_m_user_<?= $value['User_ID']; ?>"><?= $value['User_ID']; ?></label>
                   </td>
                   <td class="mange-td">
-                    <label class="form-check-label" for="del_m_user_<?= $value['User_ID']; ?>"><?= $value['F_Name'] . " " . $value['L_Name']; ?><label>
-                  </td>
-                  <td class="mange-td">
-                    <label class="form-check-label" for="del_m_user_<?= $value['User_ID']; ?>"><?= $value['Email']; ?><label>
-                  <td class="mange-td">
-                  <label class="form-check-label" id="m_user_phone_<?= $value['User_ID']; ?>">
+                    <label class="form-check-label" for="del_m_user_<?= $value['User_ID']; ?>"><?= $value['F_Name'] . " " . $value['L_Name']; ?>
                     <?php
-                    if ($value['Facebook'] == 'true') {
-                      $fb_txt = "<font color=\"#0d6efd\">(<i class=\"fab fa-facebook-f\"></i>)</font>";
-                    } else {
-                      $fb_txt = "";
-                    }
-                    if (isset($value['Phone'])) { 
-                      echo $value['Phone']." ".$fb_txt;
-                    } else {
-                      echo "N/A ".$fb_txt;
-                    } 
+                      if (isset($value['Facebook']) && !empty($value['Facebook'])) {
+                        $fb_txt = "<font color=\"#0d6efd\">(<i class=\"fab fa-facebook-f\"></i>)</font>";
+                      } else {
+                        $fb_txt = "";
+                      }
+                      echo $fb_txt;
+                      ?>
+                    </label>
+                  </td>
+                  <td class="mange-td">
+                    <label class="form-check-label" for="del_m_user_<?= $value['User_ID']; ?>"><?= $value['Email']; ?></label>
+                  <td class="mange-td">
+                  <?php
+                    if (isset($value['Phone'])) {
                     ?>
-                    <label>
+                      <label class="form-check-label" id="m_user_phone_<?= $value['User_ID']; ?>">
+                        <?= $value['Phone']; ?>
+                      </label>
+                    <?php } else { ?>
+                      <label class="form-check-label text-secondary fst-italic fs14" id="m_user_phone_<?= $value['User_ID']; ?>">
+                        N/A
+                      </label>
+                    <?php } ?>
                         <script>
                           $(document).ready(function() {
                             var phoneNo = document.getElementById('m_user_phone_<?= $value['User_ID']; ?>').innerHTML;
@@ -78,3 +109,15 @@
 </body>
 
 </html>
+<script>
+  $(document).ready(function() {
+    <?php if (session()->getFlashdata('swel_title')) { ?>
+      swal({
+        title: "<?= session()->getFlashdata('swel_title') ?>",
+        text: "<?= session()->getFlashdata('swel_text') ?>",
+        icon: "<?= session()->getFlashdata('swel_icon') ?>",
+        button: "<?= session()->getFlashdata('swel_button') ?>",
+      });
+    <?php } ?>
+  });
+</script>

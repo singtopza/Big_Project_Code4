@@ -9,6 +9,37 @@ use App\Models\ComplaintTypeModel;
 
 class ComplaintController extends Controller
 {
+  public function manage_complaint()
+  {
+    $session = session();
+    require_once(APPPATH . 'Controllers/components/setting.php');
+    $ses_userid = $session->get('ses_id');
+    $data_sending = [];
+    if (isset($ses_userid)) {
+      $model = new UsersModel();
+      require_once(APPPATH . 'Controllers/components/user_connect.php');
+      if ($Q_Pos_ID >= 3) {
+        $model_complaint = new ComplaintModel();
+        $data_sending['all_complaint_row'] = $model_complaint->view_all_complaint_row();
+        $data_sending['all_complaint'] = $model_complaint->view_all_complaint()->paginate(15);
+        $data_sending['pager'] = $model_complaint->pager;
+        return view('employee/manage_complaint', $data_sending);
+      } else {
+        $session->setFlashdata('swel_title', $st_sw_title_blockpage);
+        $session->setFlashdata('swel_text', $st_sw_text_blockpage);
+        $session->setFlashdata('swel_icon', $st_sw_icon_blockpage);
+        $session->setFlashdata('swel_button', $st_sw_button_blockpage);
+        return redirect()->to('/');
+      }
+    } else {
+      $session->setFlashdata('swel_title', $st_sw_title_unlogin);
+      $session->setFlashdata('swel_text', $st_sw_text_unlogin);
+      $session->setFlashdata('swel_icon', $st_sw_icon_unlogin);
+      $session->setFlashdata('swel_button', $st_sw_button_unlogin);
+      return redirect()->to('/login');
+    }
+  }
+
   public function complaint()
   {
     $session = session();

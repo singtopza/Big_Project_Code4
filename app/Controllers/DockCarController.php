@@ -8,6 +8,7 @@ use App\Models\DockCarModel;
 use App\Models\TicketPriceModel;
 use App\Models\VanModel;
 use App\Models\StationModel;
+use App\Models\PaymentModel;
 
 class DockCarController extends Controller
 {
@@ -130,10 +131,10 @@ class DockCarController extends Controller
         ];
       }
         $model->save($data);
-        $session->setFlashdata('swel_title_emp', 'เพิ่มข้อมูลสำเร็จ...');
-        $session->setFlashdata('swel_text_emp', 'เพิ่มข้อมูลที่ระบุเข้าระบบเรียบร้อยแล้ว');
-        $session->setFlashdata('swel_icon_emp', 'success');
-        $session->setFlashdata('swel_button_emp', 'รับทราบ');
+        $session->setFlashdata('swel_title', 'เพิ่มข้อมูลสำเร็จ...');
+        $session->setFlashdata('swel_text', 'เพิ่มข้อมูลที่ระบุเข้าระบบเรียบร้อยแล้ว');
+        $session->setFlashdata('swel_icon', 'success');
+        $session->setFlashdata('swel_button', 'รับทราบ');
         return redirect()->to('/manage-traffic');
       }else {
         $validation = $this->validator->listErrors();
@@ -176,10 +177,10 @@ class DockCarController extends Controller
             $data_sending['d_date'] = $value['Festival_Date'];
           }
         } else {
-          $session->setFlashdata('swel_title_emp', 'ไม่พบข้อมูล!');
-          $session->setFlashdata('swel_text_emp', 'ข้อมูลที่ได้รับ ไม่มีอยู่ในฐานข้อมูลของระบบ');
-          $session->setFlashdata('swel_icon_emp', 'error');
-          $session->setFlashdata('swel_button_emp', 'ตกลง');
+          $session->setFlashdata('swel_title', 'ไม่พบข้อมูล!');
+          $session->setFlashdata('swel_text', 'ข้อมูลที่ได้รับ ไม่มีอยู่ในฐานข้อมูลของระบบ');
+          $session->setFlashdata('swel_icon', 'error');
+          $session->setFlashdata('swel_button', 'ตกลง');
           return redirect()->to('/manage-allUsers');
         }
         return view('employee/edit_driving', $data_sending);
@@ -263,10 +264,10 @@ class DockCarController extends Controller
           ];
         }
         $model_dock_car->update($Dock_car_id, $data);
-        $session->setFlashdata('swel_title_emp', 'อัพเดตข้อมูลสำเร็จ...');
-        $session->setFlashdata('swel_text_emp', 'ข้อมูลที่มีการปรับเปลี่ยน ได้รับการแก้ไขเรียบร้อยแล้ว');
-        $session->setFlashdata('swel_icon_emp', 'success');
-        $session->setFlashdata('swel_button_emp', 'รับทราบ');
+        $session->setFlashdata('swel_title', 'อัพเดตข้อมูลสำเร็จ...');
+        $session->setFlashdata('swel_text', 'ข้อมูลที่มีการปรับเปลี่ยน ได้รับการแก้ไขเรียบร้อยแล้ว');
+        $session->setFlashdata('swel_icon', 'success');
+        $session->setFlashdata('swel_button', 'รับทราบ');
         return redirect()->to('/manage-traffic');
       }else {
         $validation = $this->validator->listErrors();

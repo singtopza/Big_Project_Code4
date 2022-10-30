@@ -9,6 +9,7 @@ use App\Models\PaymentModel;
 use App\Models\ReservationModel;
 use App\Models\StationModel;
 use App\Models\BankListModel;
+use App\Models\SettingModel;
 
 class PaymentController extends Controller
 {
@@ -46,6 +47,11 @@ class PaymentController extends Controller
         $session->setFlashdata('swel_button', 'ย้อนกลับ');
         return redirect()->to('/reservation');
       } else {
+
+        $model_setting = new SettingModel();
+        $data_setting = $model_setting->get_setting();
+        $pay_time_off = $data_setting->pay_time_off;
+
         foreach ($data_reservation as $value) {
           $data_sending['Reserve_ID'] = $value['Reserve_ID'];
           $data_sending['Van_Out'] = $value['Van_Out']." น.";
@@ -61,7 +67,7 @@ class PaymentController extends Controller
           $data_sending['Re_TimeStamp'] = $value['Re_TimeStamp'];
           $data_sending['Tic_Price'] = $value['Tic_Price'];
           $data_sending['Total_Price'] = $value['Total_Price'];
-          $data_sending['TimeToPay'] = $st_time_to_pay;
+          $data_sending['TimeToPay'] = $pay_time_off;
           return view('payment', $data_sending);
         }
       }
@@ -81,54 +87,69 @@ class PaymentController extends Controller
     if (isset($ses_userid)) {
       $bank_id = $this->request->getVar('radioBank');
       $reId = $this->request->getVar('reId');
-      if (isset($bank_id) && !empty($bank_id) && isset($reId) && !empty($reId)) {
-        if (!file_exists($_FILES['slip']['tmp_name']) || !is_uploaded_file($_FILES['slip']['tmp_name'])) {
-          $session->setFlashdata('swel_title', 'เกิดข้อผิดพลาด');
-          $session->setFlashdata('swel_text', 'โปรดอัพโหลดสลิปเพื่อยืนยันการชำระเงิน!');
-          $session->setFlashdata('swel_icon', 'error');
-          $session->setFlashdata('swel_button', 'ลองอีกครั้ง');
-          return redirect()->to('/payment');
-        } else {
-          $model_reservation = new ReservationModel();
-          $data_reservation = $model_reservation->getReservationAfterConfirm_reId($ses_userid, $reId);
-          if ($data_reservation) {
-            foreach ($data_reservation as $value) {
-              $Reserve_ID = $value['Reserve_ID'];
-            }
-            $fileimg =  $this->request->getFile('slip');
-            $temp = explode(".", $_FILES["slip"]["name"]);
-            $newfilename = "U".$ses_userid."R".$Reserve_ID."B".$bank_id.'.'.end($temp);
-            $fileimg->move(ROOTPATH . 'uploads/slip', $newfilename, true);
-            $data = [
-              'User_ID' => $ses_userid,
-              'Pay_DateTime' => date("Y-m-d H:i:s"),
-              'Bank' => $bank_id,
-              'Slip' => $newfilename,
-              'Confirm' => "waiting",
-              'Reserve_ID' => $Reserve_ID,
-            ];
-            $model_payment = new PaymentModel();
-            $data_save_add_payment = $model_payment->save($data);
-            if ($data_save_add_payment) {
-              $session->setFlashdata('swel_title', 'ชำระเงินเรียบร้อยแล้ว!');
-              $session->setFlashdata('swel_text', 'การชำระเงินของคุณจะได้รับการตรวจสอบภายใน 15 นาที');
-              $session->setFlashdata('swel_button', 'รับทราบ');
-              return redirect()->to('/checking');
+      if (isset($reId) && !empty($reId)) {
+        if (isset($bank_id) && !empty($bank_id)) {
+          if (!file_exists($_FILES['slip']['tmp_name']) || !is_uploaded_file($_FILES['slip']['tmp_name'])) {
+            $session->setFlashdata('bank_id', $bank_id);
+            $session->setFlashdata('swel_title', 'เกิดข้อผิดพลาด');
+            $session->setFlashdata('swel_text', 'โปรดอัพโหลดสลิปเพื่อยืนยันการชำระเงิน!');
+            $session->setFlashdata('swel_icon', 'error');
+            $session->setFlashdata('swel_button', 'ลองอีกครั้ง');
+            return redirect()->to('/payment');
+          } else {
+            $model_reservation = new ReservationModel();
+            $data_reservation = $model_reservation->getReservationAfterConfirm_reId($ses_userid, $reId);
+            if ($data_reservation) {
+              foreach ($data_reservation as $value) {
+                $Reserve_ID = $value['Reserve_ID'];
+              }
+              $fileimg =  $this->request->getFile('slip');
+              $temp = explode(".", $_FILES["slip"]["name"]);
+              $newfilename = "U".$ses_userid."R".$Reserve_ID."B".$bank_id.'.'.end($temp);
+              $fileimg->move(ROOTPATH . 'uploads/slip', $newfilename, true);
+              $data = [
+                'User_ID' => $ses_userid,
+                'Pay_DateTime' => date("Y-m-d H:i:s"),
+                'Bank' => $bank_id,
+                'Slip' => $newfilename,
+                'Confirm' => "waiting",
+                'Reserve_ID' => $Reserve_ID,
+              ];
+              $model_payment = new PaymentModel();
+              $data_save_add_payment = $model_payment->save($data);
+              if ($data_save_add_payment) {
+                $session->setFlashdata('swel_title', 'ชำระเงินเรียบร้อยแล้ว!');
+                $session->setFlashdata('swel_text', 'การชำระเงินของคุณจะได้รับการตรวจสอบภายใน 15 นาที');
+                $session->setFlashdata('swel_button', 'รับทราบ');
+                return redirect()->to('/checking');
+              } else {
+                $session->setFlashdata('swel_title', 'เกิดข้อผิดพลาด');
+                $session->setFlashdata('swel_text', 'ไม่สามารถบันทึกข้อมูลลงบนระบบได้ โปรดลองใหม่อีกครั้ง!');
+                $session->setFlashdata('swel_icon', 'error');
+                $session->setFlashdata('swel_button', 'ลองอีกครั้ง');
+                return redirect()->to('/payment');
+              }
             } else {
               $session->setFlashdata('swel_title', 'เกิดข้อผิดพลาด');
-              $session->setFlashdata('swel_text', 'ไม่สามารถบันทึกข้อมูลลงบนระบบได้ โปรดรอสักครู่!');
+              $session->setFlashdata('swel_text', 'ไม่สามารถเชื่อมต่อกับฐานข้อมูลระบบได้ โปรดลองใหม่อีกครั้ง!');
+              $session->setFlashdata('swel_icon', 'error');
               $session->setFlashdata('swel_button', 'ลองอีกครั้ง');
               return redirect()->to('/payment');
             }
-          } else {
-            $session->setFlashdata('swel_title', 'เกิดข้อผิดพลาด');
-            $session->setFlashdata('swel_text', 'ไม่สามารถเชื่อมต่อกับฐานข้อมูลระบบได้ โปรดรอสักครู่!');
-            $session->setFlashdata('swel_button', 'ลองอีกครั้ง');
-            return redirect()->to('/payment');
           }
+        } else {
+          $session->setFlashdata('swel_title', 'เกิดข้อผิดพลาด');
+          $session->setFlashdata('swel_text', 'โปรดเลือกธนาคารที่ชำระเงินเพื่อยืนยันการชำระเงิน!');
+          $session->setFlashdata('swel_icon', 'error');
+          $session->setFlashdata('swel_button', 'ลองอีกครั้ง');
+          return redirect()->to('/payment');
         }
       } else {
-
+        $session->setFlashdata('swel_title', 'เกิดข้อผิดพลาด');
+        $session->setFlashdata('swel_text', 'ไม่พบข้อมูลการจอง โปรดลองใหม่อีกครั้ง!');
+        $session->setFlashdata('swel_icon', 'error');
+        $session->setFlashdata('swel_button', 'ลองอีกครั้ง');
+        return redirect()->to('/payment');
       }
     } else {
       require_once(APPPATH . 'Controllers/components/setting.php');
@@ -204,6 +225,38 @@ class PaymentController extends Controller
       }
     } else {
       require_once(APPPATH . 'Controllers/components/setting.php');
+      $session->setFlashdata('swel_title', $st_sw_title_unlogin);
+      $session->setFlashdata('swel_text', $st_sw_text_unlogin);
+      $session->setFlashdata('swel_icon', $st_sw_icon_unlogin);
+      $session->setFlashdata('swel_button', $st_sw_button_unlogin);
+      return redirect()->to('/login');
+    }
+  }
+
+  public function manage_around()
+  {
+    $session = session();
+    require_once(APPPATH . 'Controllers/components/setting.php');
+    $ses_userid = $session->get('ses_id');
+    $data_sending = [];
+    if (isset($ses_userid)) {
+      $model = new UsersModel();
+      require_once(APPPATH . 'Controllers/components/user_connect.php');
+      if ($Q_Pos_ID >= 3) {
+        $model_payment = new PaymentModel();
+        $model_station = new StationModel();
+        $data_sending['around_G'] = $model_payment->view_all_around_byReservation_G();
+        $data_sending['around'] = $model_payment->view_all_around_byReservation();
+        $data_sending['station'] = $model_station->getStation();
+        return view('employee/manage_around', $data_sending);
+      } else {
+        $session->setFlashdata('swel_title', $st_sw_title_blockpage);
+        $session->setFlashdata('swel_text', $st_sw_text_blockpage);
+        $session->setFlashdata('swel_icon', $st_sw_icon_blockpage);
+        $session->setFlashdata('swel_button', $st_sw_button_blockpage);
+        return redirect()->to('/');
+      }
+    } else {
       $session->setFlashdata('swel_title', $st_sw_title_unlogin);
       $session->setFlashdata('swel_text', $st_sw_text_unlogin);
       $session->setFlashdata('swel_icon', $st_sw_icon_unlogin);
