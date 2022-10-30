@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-	<title>I-Van</title>
+	<title>รายละเอียดตั๋ว</title>
 	<?php require('components/header.php'); ?>
 </head>
 
