@@ -132,8 +132,6 @@ class ReservationController extends BaseController
     $session = session();
     $ses_userid = $session->get('ses_id');
     if (isset($ses_userid)) {
-      $model_banklist = new BankListModel();
-      $data_sending['banklist'] = $model_banklist->findAll();
       $select_chair = $this->request->getVar('select-chair');
       $first_station = $this->request->getVar('first_station');
       $end_station = $this->request->getVar('end_station');
