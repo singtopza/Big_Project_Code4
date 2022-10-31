@@ -66,8 +66,13 @@
                   <th class="mange-th">แก้ไข</th>
                 </tr>
               </thead>
-              <?php foreach ($list_users as $value) { ?>
-                <tr>
+              <?php
+              foreach ($list_users as $value) {
+                $date = date("Y-m-d", $value['Reg_Date']);
+                $date = date_create($date);
+                $date = date_format($date, "d-m-Y");
+              ?>
+                <tr data-bs-toggle="tooltip" data-bs-placement="bottom" title="ลงทะเบียนเมื่อ <?= $date; ?>">
                   <td class="mange-td">
                     <div class="form-check">
                       <form action="<?php echo base_url('/EmployeeController/user_del_userId_byCB'); ?>" method="POST">
@@ -100,7 +105,7 @@
                       </label>
                     <?php } else { ?>
                       <label class="form-check-label text-secondary fst-italic fs14" id="m_user_phone_<?= $value['User_ID']; ?>">
-                        N/A
+                        Null
                       </label>
                     <?php } ?>
                     <script>
@@ -112,12 +117,12 @@
                   </td>
                   <td class="mange-td">
                     <!-- <span class="<?php if ($value['Pos_ID'] == 2) {
-                                    echo "text-primary";
-                                  } else if ($value['Pos_ID'] == 3) {
-                                    echo "text-orange";
-                                  } else if ($value['Pos_ID'] == 4) {
-                                    echo "text-danger";
-                                  } ?>"><?= $value['Pos_Name']; ?>
+                                        echo "text-primary";
+                                      } else if ($value['Pos_ID'] == 3) {
+                                        echo "text-orange";
+                                      } else if ($value['Pos_ID'] == 4) {
+                                        echo "text-danger";
+                                      } ?>"><?= $value['Pos_Name']; ?>
                     </span> -->
                     <span><?= $value['Pos_Name']; ?></span>
                   </td>
@@ -139,6 +144,11 @@
 
 </html>
 <script>
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+
   $(document).ready(function() {
     <?php if (session()->getFlashdata('swel_title')) { ?>
       swal({

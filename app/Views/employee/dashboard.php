@@ -154,17 +154,17 @@
               </thead>
               <tbody>
                 <?php foreach ($allreservations as $value) { ?>
-                  <tr data-toggle="tooltip" <?php
-                                            if ($value['Confirm'] == 'success') {
-                                              echo 'title="การชำระเงินเสร็จสิ้นแล้ว"';
-                                            } else if ($value['Confirm'] == 'cancel') {
-                                              echo 'title="รายการถูกยกเลิกโดยระบบ"';
-                                            } else if ($value['Confirm'] == 'waiting') {
-                                              echo 'title="กำลังรอการตรวจสอบ"';
-                                            } else {
-                                              echo 'title="เกิดข้อผิดพลาดไม่ทราบสาเหตุ!"';
-                                            }
-                                            ?>>
+                  <tr data-bs-toggle="tooltip" data-bs-placement="bottom" <?php
+                                                                          if ($value['Confirm'] == 'success') {
+                                                                            echo 'title="การชำระเงินเสร็จสิ้นแล้ว"';
+                                                                          } else if ($value['Confirm'] == 'cancel') {
+                                                                            echo 'title="รายการถูกยกเลิกโดยระบบ"';
+                                                                          } else if ($value['Confirm'] == 'waiting') {
+                                                                            echo 'title="กำลังรอการตรวจสอบ"';
+                                                                          } else {
+                                                                            echo 'title="เกิดข้อผิดพลาดไม่ทราบสาเหตุ!"';
+                                                                          }
+                                                                          ?>>
                     <td class="tb-dash-td">
                       <label class="form-check-label">
                         <?= $value['Reserve_ID']; ?>
@@ -212,8 +212,14 @@
     </div> <!-- END CONTENT -->
   </div> <!-- END Wrapper -->
 </body>
+
 </html>
 <script>
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+
   $(document).ready(function() {
     <?php if (session()->getFlashdata('swel_title')) { ?>
       swal({
