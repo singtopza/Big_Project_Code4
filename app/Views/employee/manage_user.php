@@ -50,6 +50,7 @@
                   <th class="mange-th">ชื่อ - นามสกุล</th>
                   <th class="mange-th">Email</th>
                   <th class="mange-th">เบอร์โทรศัพท์</th>
+                  <th class="mange-th">วันนี้ลงทะเบียน</th>
                 </tr>
               </thead>
               <?php foreach ($list_users as $value) { ?>
@@ -77,6 +78,7 @@
                   </td>
                   <td class="mange-td">
                     <label class="form-check-label" for="del_m_user_<?= $value['User_ID']; ?>"><?= $value['Email']; ?></label>
+                  </td>
                   <td class="mange-td">
                   <?php
                     if (isset($value['Phone'])) {
@@ -86,7 +88,7 @@
                       </label>
                     <?php } else { ?>
                       <label class="form-check-label text-secondary fst-italic fs14" id="m_user_phone_<?= $value['User_ID']; ?>">
-                        N/A
+                        Null
                       </label>
                     <?php } ?>
                         <script>
@@ -95,6 +97,16 @@
                             document.getElementById('m_user_phone_<?= $value['User_ID']; ?>').innerHTML = phoneNo.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
                           });
                         </script>
+                  </td>
+                  <td>
+                    <label>
+                      <?php
+                        $date = date("Y-m-d", $value['Reg_Date']);
+                        $date = date_create($date);
+                        $date = date_format($date, "d-m-Y");
+                      ?>
+                      <?= $date; ?>
+                    </label>
                   </td>
                 </tr>
               <?php } ?>
