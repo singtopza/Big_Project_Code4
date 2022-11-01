@@ -153,7 +153,6 @@ class ReservationModel extends Model
     return $this->db
       ->table('reservation')
       ->where($where_sql)
-      ->limit(1)
       ->delete();
   }
 }

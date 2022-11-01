@@ -340,8 +340,28 @@
       });
     <?php } ?>
 
+
+
     var start = document.getElementById("select-start-form").value;
     var end = document.getElementById("select-end-form").value;
+    if (start == 0 || end == 0) {
+      document.getElementById("time").disabled = true;
+      document.getElementById("date").disabled = true;
+    } else {
+      document.getElementById("time").disabled = false;
+      document.getElementById("date").disabled = false;
+      if (start == end) {
+        document.getElementById("select-start-form").value = '';
+        document.getElementById("select-end-form").value = '';
+        swal({
+          title: "เกิดข้อผิดพลาด",
+          text: "ไม่สามารถเลือกต้นทาง และปลายทางซ้ำกันได้!",
+          icon: "error",
+          button: "รับทราบ",
+        });
+      }
+    }
+
     if (start == 0 || end == 0) {
       document.getElementById("time").disabled = true;
       document.getElementById("date").disabled = true;
