@@ -548,11 +548,11 @@ class UserController extends Controller
               $session->setFlashdata('swel_button', 'รับทราบ');
               return redirect()->to('/');
             }
-            $arr_cookie_options_else = array(
+            $arr_cookie_options = array(
               'path' => '/',
             );
-            setcookie("email", "", $arr_cookie_options_else);
-            setcookie("password", "", $arr_cookie_options_else);
+            setcookie("email", "", $arr_cookie_options);
+            setcookie("password", "", $arr_cookie_options);
 
             $model_setting = new SettingModel();
             $data_setting = $model_setting->get_setting();
@@ -607,11 +607,11 @@ class UserController extends Controller
                   $session->setFlashdata('swel_button', 'รับทราบ');
                   return redirect()->to('/');
                 }
-                $arr_cookie_options_else = array(
+                $arr_cookie_options = array(
                   'path' => '/',
                 );
-                setcookie("email", "", $arr_cookie_options_else);
-                setcookie("password", "", $arr_cookie_options_else);
+                setcookie("email", "", $arr_cookie_options);
+                setcookie("password", "", $arr_cookie_options);
 
                 $model_setting = new SettingModel();
                 $data_setting = $model_setting->get_setting();
@@ -678,15 +678,12 @@ class UserController extends Controller
     $email = $this->request->getVar('email');
     $password = $this->request->getVar('password');
     $rememberme = $this->request->getVar('rememberme');
+    $arr_cookie_options = array(
+    //   'expires' => time() + 10 * 365 * 24 * 60 * 60,
+      'path' => '/',
+    );
     if (isset($email) && !empty($email) && isset($password) && !empty($password)) {
       $data = $model->get_data_login($email);
-      $arr_cookie_options = array(
-        'expires' => time() + 10 * 365 * 24 * 60 * 60,
-        'path' => '/',
-      );
-      $arr_cookie_options_else = array(
-        'path' => '/',
-      );
       if ($data) {
         $data_model_count = $model->count_data_login($email);
         if ($data_model_count >= 1) {
@@ -716,7 +713,7 @@ class UserController extends Controller
   
               $timestamp = time();
               $timestamp = $timestamp + $session_timeout;
-              if ($session_timeout == -1) {
+              if ($session_timeout <= -1) {
                 $ses_data = [
                   'ses_id' => $user_id,
                   'ses_timestamp_kick' => -1,
@@ -731,8 +728,8 @@ class UserController extends Controller
                 setcookie("email", $email, $arr_cookie_options);
                 setcookie("password", $password, $arr_cookie_options);
               } else {
-                setcookie("email", "", $arr_cookie_options_else);
-                setcookie("password", "", $arr_cookie_options_else);
+                setcookie("email", "", $arr_cookie_options);
+                setcookie("password", "", $arr_cookie_options);
               }
               $session->set($ses_data);
               $session->setFlashdata('swel_title', 'เข้าสู่ระบบสำเร็จแล้ว');
@@ -740,30 +737,27 @@ class UserController extends Controller
               $session->setFlashdata('swel_button', 'เข้าใช้งาน');
               return redirect()->to('/');
             } else {
-              setcookie("email", $email, $arr_cookie_options_else);
-              setcookie("password", "", $arr_cookie_options_else);
+              setcookie("email", $email, $arr_cookie_options);
+              setcookie("password", "", $arr_cookie_options);
               $session->setFlashdata('msg', 'รหัสผ่านไม่ถูกต้อง!');
             }
             return redirect()->to('/login');
           }
         } else {
-          setcookie("email", $email, $arr_cookie_options_else);
-          setcookie("password", "", $arr_cookie_options_else);
+          setcookie("email", $email, $arr_cookie_options);
+          setcookie("password", "", $arr_cookie_options);
           $session->setFlashdata('msg', 'ไม่พบที่อยู่อีเมลนี้ในระบบ!');
           return redirect()->to('/login');
         }
       } else {
-        setcookie("email", $email, $arr_cookie_options_else);
-        setcookie("password", "", $arr_cookie_options_else);
+        setcookie("email", $email, $arr_cookie_options);
+        setcookie("password", "", $arr_cookie_options);
         $session->setFlashdata('msg', 'ไม่พบที่อยู่อีเมลนี้ในระบบ!');
         return redirect()->to('/login');
       }
     } else {
-      $arr_cookie_options_else = array(
-        'path' => '/',
-      );
-      setcookie("email", "", $arr_cookie_options_else);
-      setcookie("password", "", $arr_cookie_options_else);
+      setcookie("email", "", $arr_cookie_options);
+      setcookie("password", "", $arr_cookie_options);
       $session->setFlashdata('msg', 'โปรดกรอกข้อมูลให้ครบถ้วน ก่อนดำเนินการเข้าสู่ระบบ!');
       return redirect()->to('/login');
     }
