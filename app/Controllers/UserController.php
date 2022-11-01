@@ -868,6 +868,10 @@ class UserController extends Controller
       ];
       $data_users = $model->where('Email', $this->request->getVar('email'))->first();
       if (isset($data_users)) {
+        $session->setFlashdata('swel_title', 'เกิดข้อผิดพลาด!');
+        $session->setFlashdata('swel_text', 'อีเมลนี้ถูกใช้แล้ว!');
+        $session->setFlashdata('swel_icon', 'error');
+        $session->setFlashdata('swel_button', 'ลองอีกครั้ง');
         return redirect()->to('/register');
       } else {
         $data_save_user = $model->save($data);
