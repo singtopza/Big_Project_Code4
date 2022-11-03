@@ -43,7 +43,11 @@
                   <label class="form-check-label">
                     <?php
                     echo $history_['Station_Name'] . " - ";
-                    echo $Station_End_Name['Station_Name'];
+                    foreach ($Station_End_Name as $his_end) {
+                      if ($history_['Station_End'] == $his_end['Station_ID']) {
+                        echo $his_end['Station_Name'];
+                      }
+                    }
                     ?>
                   </label><br />
                   <label class="form-check-label"><?= $history_['Go_Date']; ?></label><br />

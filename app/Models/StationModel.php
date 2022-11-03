@@ -14,7 +14,8 @@ class StationModel extends Model {
     return $this->db
     ->table('station')
     ->orderBy('Station_ID', 'ASC')
-    ->get()->getResultArray();
+    ->get()
+    ->getResultArray();
   }
 
   public function getStationNK()
@@ -24,7 +25,8 @@ class StationModel extends Model {
     ->table('station')
     ->where($where_sql)
     ->orderBy('Station_ID', 'ASC')
-    ->get()->getResultArray();
+    ->get()
+    ->getResultArray();
   }
 
   public function getStationById_S($first_station)
