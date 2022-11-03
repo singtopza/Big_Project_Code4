@@ -135,11 +135,8 @@ class TicketController extends BaseController
       $user_ID = $ses_userid;
       $data_ticket = $model_ticket->get_history($user_ID);
       $data_sending['history'] = $data_ticket;
-      foreach ($data_ticket as $value) {
-        $data_station_end = $value['Station_End'];
-        $model_station = new StationModel();
-        $data_sending['Station_End_Name'] = $model_station->getStationById_E($data_station_end);
-      }
+      $model_station = new StationModel();
+      $data_sending['Station_End_Name'] = $model_station->getStation();
       return view('his_reservation', $data_sending);
     } else {
       $session = session();
